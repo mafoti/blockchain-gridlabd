@@ -20,7 +20,9 @@
 #include <string>
 #include <sstream>
 
-//int blockNode::id;
+#include "ethereumapi.h"
+//#include <jsonrpccpp/client/connectors/httpclient.h>
+
 
 using namespace std;
 
@@ -34,7 +36,7 @@ void blockNode::initNode(int id) {
 
 	//stringId :  password for new nodes, port, id
 	std::string stringId(ss.str());
-	std::string root = "/home/ubuntu/tmp/eth/13212";
+	std::string root = "/home/user/tmp/eth/1923";
 	std::string datadir = root + "/data/" + stringId;
 
 	const char * dirPath = datadir.c_str();
@@ -46,10 +48,7 @@ void blockNode::initNode(int id) {
 
 		string systemString = "bash -c \"geth --datadir ";
 		systemString += datadir;
-		systemString += " --port ";
-		systemString += stringId;
-		systemString += " --networkid 13212 init /home/ubuntu/tmp/eth/13212/genesis.json";
-		systemString += " js <(echo 'console.log(admin.nodeInfo.enode); exit();')\" 2>/dev/null | grep enode | tee >> /home/ubuntu/tmp/eth/nodes";
+		systemString += " init /home/user/tmp/eth/1923/genesis.json\"";
 
 		cout << systemString << endl;
 		const char * systemCommand = systemString.c_str();
@@ -88,7 +87,7 @@ void blockNode::initNode(int id) {
 		const char * systemCommand = systemString.c_str();
 		system(systemCommand);
 
-		//copy keystore from /home/ubuntu/tmp/eth/13212/data/30300 to /home/ubuntu/tmp/eth/13212/keystore/30300
+		//copy keystore from /home/user/tmp/eth/1923/data/30300 to /home/user/tmp/eth/1923/keystore/30300
 		systemString = "cp -R ";
 		systemString += datadir;
 		systemString += "/keystore ";
@@ -98,7 +97,7 @@ void blockNode::initNode(int id) {
 		systemCommand = systemString.c_str();
 		system(systemCommand);
 
-		//copy keystore from /home/ubuntu/tmp/eth/13212/keystore/30300 to /home/ubuntu/tmp/eth/13212/data/30300/keystore
+		//copy keystore from /home/user/tmp/eth/1923/keystore/30300 to /home/user/tmp/eth/1923/data/30300/keystore
 		systemString = "cp -R ";
 		systemString += accountPathS;
 		systemString += "/keystore ";
@@ -137,27 +136,41 @@ void blockNode::startNode(int id) {
 	std::string stringPort(sp.str());
 
 
-	std::string root = "/home/ubuntu/tmp/eth/13212";
+	std::string root = "/home/user/tmp/eth/1923";
 	std::string datadir = root + "/data/" + stringId;
 
 	string systemString = "bash -c \"geth --datadir=";
 	systemString += datadir;
 	systemString += " --identity=\"mynode-";
 	systemString += stringId;
-	systemString += "\" --nodiscover --port=";
+	systemString += "\" --port=";
 	systemString += stringId;
 	systemString += " --password=<(echo -n ";
 	systemString += stringId;
 	systemString += ") --rpc --rpcport=";
 	systemString += stringPort;
-	systemString += "  --rpccorsdomain='*' home/ubuntu/tmp/eth/13212/genesis.json 2>&1 &\"";
+	systemString += " --ipcpath=";
+	systemString += datadir;
+	systemString += "/geth.ipc --networkid 1923 2>&1 &\"";
 
 	cout << systemString << endl;
 	const char * systemCommand = systemString.c_str();
 
 	system(systemCommand);
 
-	//$GETH --datadir=$datadir --identity="$dd" --nodiscover --port=$port --password=<(echo -n $dd) --rpc --rpcport=$rpcport --rpccorsdomain='*' $* 2>&1 | tee "$stablelog" > "$log" &
+	/*jsonrpc::HttpClient httpclient("http://localhost:8101");
+	EthereumAPI c(httpclient);
+	try
+	{
+		cout << c.eth_accounts() << endl;
+	}
+	catch (jsonrpc::JsonRpcException & e)
+	{
+		cerr << e.what() << endl;
+	}*/
+
+	//geth --datadir /home/user/tmp/eth/1923/data/30300 --identity mynode-30300 --port 30300 --rpcport 8101 --ipcpath /home/user/tmp/eth/1923/data/30300/geth.ipc --networkid 1923 console
+	//$GETH --datadir=$datadir --identity="$dd" --nodiscover --port=$port --password=<(echo -n $dd) --rpc --rpcport=$rpcport --ipcpath=/home/user/tmp/eth/1923/data/30300/geth.ipc --rpccorsdomain='*' $* 2>&1 | tee "$stablelog" > "$log" &
 
 }
 
