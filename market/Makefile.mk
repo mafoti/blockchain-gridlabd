@@ -6,11 +6,12 @@ market_market_la_CPPFLAGS += $(AM_CPPFLAGS)
 market_market_la_LDFLAGS =
 market_market_la_LDFLAGS += $(AM_LDFLAGS)
 
-market_market_la_LIBADD =
+market_market_la_LIBADD = -ljsoncpp -lcurl -ljsonrpccpp-common -ljsonrpccpp-client
 
 market_market_la_SOURCES =
 market_market_la_SOURCES += market/auction.cpp
 market_market_la_SOURCES += market/auction.h
+market_market_la_SOURCES += market/ethereumapi.h
 market_market_la_SOURCES += market/blockNode.cpp
 market_market_la_SOURCES += market/blockNode.h
 market_market_la_SOURCES += market/bid.cpp
