@@ -225,6 +225,18 @@ class EthereumAPI : public jsonrpc::Client
             else
                 throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
         }
+        bool personal_unlockAccount(const std::string& param1,const std::string& param2,const std::string& param3) throw (jsonrpc::JsonRpcException)
+		{
+			Json::Value p;
+			p.append(param1);
+			p.append(param2);
+			p.append(param3);
+			Json::Value result = this->CallMethod("personal_unlockAccount",p);
+			if (result.isBool())
+				return result.asBool();
+			else
+				throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
+		}
         std::string eth_sendRawTransaction(const std::string& param1) throw (jsonrpc::JsonRpcException)
         {
             Json::Value p;

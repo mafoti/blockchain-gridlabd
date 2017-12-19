@@ -865,6 +865,8 @@ void auction::record_curve(double bu, double su){
 
 void auction::clear_market(void)
 {
+	OBJECT *obj=OBJECTHDR(this);
+	this->blockchain.clearMarket(obj->id);
 	unsigned int sph24 = (unsigned int)(3600/period*24);
 	BID unresponsive;
 	extern double bid_offset;

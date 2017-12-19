@@ -16,6 +16,9 @@ public:
 	int rpcPort;
 	void initNode(int id);
 	void startNode(int id);
+	void clearMarket(int id);
+	void submitConsumptionBid(int id, int price, int quantity);
+	void submitGenerationBid(int id, int price, int quantity);
 	blockNode();
 	virtual ~blockNode();
 };

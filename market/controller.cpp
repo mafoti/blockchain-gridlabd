@@ -1350,6 +1350,8 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 			}
 			residual -= loadP;
 
+			//submit transaction bid
+
 		} else {
 			last_p = 0;
 			last_q = 0;
@@ -1606,6 +1608,7 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 					if(controller_bid.bid_accepted == false){
 						return TS_INVALID;
 					}
+
 				}
 			} else if (ps == *PS_OFF) {
 				if(0 != strcmp(market_unit, "")){
@@ -1878,10 +1881,18 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 				}
 				((void (*)(char *, char *, char *, char *, void *, size_t))(*submit))((char *)gl_name(hdr, ctrname, 1024), (char *)(&pMkt), "submit_bid_state", "auction", (void *)&controller_bid, (size_t)sizeof(controller_bid));
 				controller_bid.rebid = true;
+				//submit transaction bid
+				int price = (int)(controller_bid.price * 100);
+				int quantity = (int)(controller_bid.quantity * 100);
+				this->blockchain.submitConsumptionBid(hdr->id, price, quantity);
 			} else {
 				controller_bid.state = BS_UNKNOWN;
 				((void (*)(char *, char *, char *, char *, void *, size_t))(*submit))((char *)gl_name(hdr, ctrname, 1024), (char *)(&pMkt), "submit_bid_state", "auction", (void *)&controller_bid, (size_t)sizeof(controller_bid));
 				controller_bid.rebid = true;
+				//submit transaction bid
+				int price = (int)(controller_bid.price * 100);
+				int quantity = (int)(controller_bid.quantity * 100);
+				this->blockchain.submitConsumptionBid(hdr->id, price, quantity);
 			}
 			if(controller_bid.bid_accepted == false){
 				return TS_INVALID;
@@ -1902,12 +1913,18 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 					controller_bid.state = BS_OFF;
 				}
 				((void (*)(char *, char *, char *, char *, void *, size_t))(*submit))((char *)gl_name(hdr, ctrname, 1024), (char *)(&pMkt), "submit_bid_state", "auction", (void *)&controller_bid, (size_t)sizeof(controller_bid));
+				//submit transaction bid
+				int price = (int)(controller_bid.price * 100);
+				int quantity = (int)(controller_bid.quantity * 100);
+				this->blockchain.submitConsumptionBid(hdr->id, price, quantity);
 				if(controller_bid.bid_accepted == false){
 					return TS_INVALID;
 				}
 				controller_bid.rebid = true;
 			}
 		}
+
+
 	}
 
 	if ( powerstate_prop.is_valid() )
