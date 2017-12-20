@@ -145,9 +145,9 @@ void blockNode::startNode(int id) {
 
 	string systemString = "bash -c \"geth --datadir=";
 	systemString += datadir;
-	systemString += " --identity \mynode-";
+	systemString += " --identity mynode-";
 	systemString += stringId;
-	systemString += "\ --unlock --port ";
+	systemString += " --port ";
 	systemString += stringId;
 	systemString += " --password <(echo -n ";
 	systemString += stringId;
@@ -162,29 +162,45 @@ void blockNode::startNode(int id) {
 
 	system(systemCommand);
 
-	jsonrpc::HttpClient httpclientt("http://localhost:" + stringPort);
-	EthereumAPI cc(httpclientt);
+	//get the address of the newly created account
+	jsonrpc::HttpClient httpclient("http://localhost:"+stringPort);
+	EthereumAPI c(httpclient);
 	Json::Value accounts;
-	bool created=false;
-	while(!created){
+	bool created = false;
+	while (!created) {
 		try {
-			accounts = cc.eth_accounts();
+			accounts = c.eth_accounts();
 			cout << "accounts : " << accounts << endl;
-			created=true;
+			created = true;
 		} catch (jsonrpc::JsonRpcException& e) {
-			created=false;
+			cout << "error getting eth_accounts " << e.GetMessage() << endl;
+			created = false;
 		}
 	}
-	//string address = accounts[0].asString();
-	//systemString = "bash -c \"geth --datadir "+datadir+" --unlock " + address + " --password <(echo -n " + stringId +")\"";
-	//cout << systemString << endl;
-	//systemCommand = systemString.c_str();
-	//system(systemCommand);
 
+	//unlock the account holding eths
+	jsonrpc::HttpClient marketclient("http://localhost:8100");
+	EthereumAPI market(marketclient);
+	try {
+		string address = "0xad56cedb7d9ee48b3b93f682a9e2d87f80221768";
+		market.personal_unlockAccount(address, "0", 0);
+	} catch (jsonrpc::JsonRpcException& e) {
+		cout << "error unlocking account " << e.GetMessage() << endl;
+	}
 
-	/**/
-	//geth --datadir /home/user/tmp/eth/1923/data/30300 --identity mynode-30300 --port 30300 --rpcport 8101 --ipcpath /home/user/tmp/eth/1923/data/30300/geth.ipc --networkid 1923 console
-	//$GETH --datadir=$datadir --identity="$dd" --nodiscover --port=$port --password=<(echo -n $dd) --rpc --rpcport=$rpcport --ipcpath=/home/user/tmp/eth/1923/data/30300/geth.ipc --rpccorsdomain='*' $* 2>&1 | tee "$stablelog" > "$log" &
+	//send eths to the new account
+	try
+	{
+		Json::Value root; // {}
+		root["from"] = "0xad56cedb7d9ee48b3b93f682a9e2d87f80221768";
+		root["to"] = accounts[0];
+		root["value"] = "0x9184e72a"; // 2441406250
+		market.eth_sendTransaction(root);
+	}
+	catch (jsonrpc::JsonRpcException & e)
+	{
+		cerr << e.what() << endl;
+	}
 
 }
 
@@ -193,17 +209,38 @@ void blockNode::clearMarket(int id){
 
 	jsonrpc::HttpClient httpclient("http://localhost:8100");
 	EthereumAPI c(httpclient);
+
+	/*Json::Value accounts;
+
+	bool created = false;
+	while (!created) {
+		try {
+			accounts = c.eth_accounts();
+			cout << "accounts : " << accounts << endl;
+			created = true;
+		} catch (jsonrpc::JsonRpcException& e) {
+			cout << "error getting eth_accounts " << e.GetMessage() << endl;
+			created = false;
+		}
+	}*/
+
+	try {
+		//string address = accounts[0].asString();
+		string address = "0xad56cedb7d9ee48b3b93f682a9e2d87f80221768";
+		c.personal_unlockAccount(address, "0", 0);
+	} catch (jsonrpc::JsonRpcException& e) {
+		cout << "error unlocking account " << e.GetMessage() << endl;
+	}
+
 	try
 	{
 		//contract address: 0xf176c2f03773b63a6e3659423d7380bfa276dcb3
 		//default account : 0xad56cedb7d9ee48b3b93f682a9e2d87f80221768
-		// 027cb7c6 clear();
-		//Json::Value result = "\"from\": \"0x1d1ae163d75d6689c6c70c7367bbd08ac5361e4e\", \"to\": \"0x35bc45bb2c4c8f311ed9e0e867287ecb9ca90f8b\", \"data\": \"0x256a9ea1\"";
 		Json::Value root; // {}
 		root["from"] = "0xad56cedb7d9ee48b3b93f682a9e2d87f80221768";
 		root["to"] = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
 		root["data"] = "0x256a9ea1";
-		string result = c.eth_call(root,"latest");
+		string result = c.eth_sendTransaction(root);
 		cout << "market clearing result : " << result << endl;
 	}
 	catch (jsonrpc::JsonRpcException & e)
@@ -214,18 +251,34 @@ void blockNode::clearMarket(int id){
 //"7f495ea5": "consumptionBid(int256,int256)",
 void blockNode::submitConsumptionBid(int id, int price, int quantity){
 	//comment out when gas problem solved
-	id=0;
 	nodeId = 30300 + id;
 	rpcPort = 8101 + id;
 
 	std::stringstream sp;
-	sp << this->rpcPort;
+	sp << rpcPort;
 	std::string stringPort(sp.str());
-	cout << "httpclient     http://localhost:" + stringPort << "nodeId "<< nodeId << endl;
+
+	std::stringstream ss;
+	ss << nodeId;
+	std::string stringId(ss.str());
+
+
+	cout << "httpclient http://localhost:" + stringPort << "nodeId "<< nodeId << endl;
+
 	jsonrpc::HttpClient httpclient("http://localhost:" + stringPort);
 	EthereumAPI c(httpclient);
 	Json::Value accounts = c.eth_accounts();
 	cout << "accounts : " << accounts[0] << endl;
+
+	//UnlockAccount
+	try {
+		string address = accounts[0].asString();
+		c.personal_unlockAccount(address, stringId, 0);
+	} catch (jsonrpc::JsonRpcException& e) {
+		cout << "error unlocking account " << e.GetMessage() << endl;
+	}
+
+
 
 	std::stringstream stream;
 	stream << setfill('0') << setw(64) << std::hex << price;
