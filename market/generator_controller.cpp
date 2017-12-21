@@ -164,6 +164,7 @@ int generator_controller::create(void)
 int generator_controller::init(OBJECT *parent)
 {
 	OBJECT *obj = OBJECTHDR(this);
+	parent2=parent;
 	PROPERTY *ptemp;
 	set *temp_set;
 	int index;
@@ -656,7 +657,8 @@ int generator_controller::init(OBJECT *parent)
 
 	//Determine bidding unit base
 	unit_scaling_value = 1000000.0*input_unit_base;
-
+	double *bid_price = gl_get_double_by_name(parent2, "price");
+	init_bid_price = *bid_price;
 	return 1;
 }
 
@@ -1026,6 +1028,11 @@ TIMESTAMP generator_controller::sync(TIMESTAMP t0, TIMESTAMP t1)
 			*/
 		}
 
+		double *bid_power_active;
+		double *bid_power_reactive;
+		double *bid_price;
+		complex *complex_power;
+
 		//See if the current value is valid, then bid in
 		if (bid_curve_values[latency_write_section].valid_bid_period == true)
 		{
@@ -1042,6 +1049,27 @@ TIMESTAMP generator_controller::sync(TIMESTAMP t0, TIMESTAMP t1)
 					controller_bid.market_id = *curr_market_id;
 					controller_bid.price = bid_curve_values[latency_write_section].Curve_Info[index].price;
 					controller_bid.quantity = temp_power_value;
+
+					//////////////////// NEW ///////////////////////
+					if (gl_object_isa(parent2, "windturb_dg", "generators"))
+					{
+						bid_power_active = gl_get_double_by_name(parent2, "TotalRealPow");
+						bid_price = gl_get_double_by_name(parent2, "price");
+						controller_bid.price = *bid_price;
+						controller_bid.quantity = *bid_power_active/1000;
+						//printf("wind bid_price=%f, bid_quantity=%f \n", controller_bid.price, controller_bid.quantity);
+
+					}
+					else if (gl_object_isa(parent2, "solar", "generators"))
+					{
+						complex_power = gl_get_complex_by_name(parent2, "VA_Out");
+						bid_price = gl_get_double_by_name(parent2, "price");
+						controller_bid.price = *bid_price;
+						controller_bid.quantity = (*complex_power).Re()/1000;
+						//printf("solar bid_price=%f, bid_quantity=%f \n", controller_bid.price, controller_bid.quantity);
+					}
+					///////////////////////////////////////////////
+
 					if (gen_state != GEN_OFF) {
 						controller_bid.state = BS_ON;
 					} else {
@@ -1082,6 +1110,29 @@ TIMESTAMP generator_controller::sync(TIMESTAMP t0, TIMESTAMP t1)
 					controller_bid.market_id = *curr_market_id;
 					controller_bid.price = bid_curve_values[latency_write_section].Curve_Info[0].price;
 					controller_bid.quantity = -temp_power_value;
+
+					//////////////////// NEW ///////////////////////
+					if (gl_object_isa(parent2, "windturb_dg", "generators"))
+					{
+						bid_power_active = gl_get_double_by_name(parent2, "TotalRealPow");
+						bid_price = gl_get_double_by_name(parent2, "price");
+						controller_bid.price = *bid_price;
+						controller_bid.quantity = *bid_power_active;
+						//printf("wind bid_price=%f, bid_quantity=%f \n", controller_bid.price, controller_bid.quantity);
+
+					}
+					else if (gl_object_isa(parent2, "solar", "generators"))
+					{
+						complex_power = gl_get_complex_by_name(parent2, "VA_Out");
+						bid_price = gl_get_double_by_name(parent2, "price");
+						controller_bid.price = *bid_price;
+						controller_bid.quantity = (*complex_power).Re()/1000;
+						//printf("solar bid_price=%f, bid_quantity=%f \n", controller_bid.price, controller_bid.quantity);
+					}
+					///////////////////////////////////////////////
+
+
+
 					if (gen_state == GEN_OFF) {
 						controller_bid.state = BS_ON;
 					} else {

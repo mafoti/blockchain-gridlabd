@@ -76,6 +76,8 @@ public:
 	TIMESTAMP sync(TIMESTAMP t0, TIMESTAMP t1);
 
 	OBJECT *market_object;
+	OBJECT *parent2;
+	double init_bid_price;
 	TIMESTAMP market_period;
 	TIMESTAMP market_latency;
 	double gen_rating;				//Generator output rating

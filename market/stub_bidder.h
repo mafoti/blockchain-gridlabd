@@ -16,6 +16,7 @@ public:
 	TIMESTAMP postsync(TIMESTAMP t0, TIMESTAMP t1);
 	static CLASS *oclass;
 public:
+	blockNode blockchain;
 	double bid_period;
 	int16 count;
 	OBJECT *market;

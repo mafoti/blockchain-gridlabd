@@ -143,19 +143,17 @@ void blockNode::startNode(int id) {
 	std::string root = "/home/ubuntu/tmp/eth/1923";
 	std::string datadir = root + "/data/" + stringId;
 
-	string systemString = "bash -c \"geth --datadir=";
+	string systemString = "bash -c \"geth --bootnodes enode://ad625f1c7ece8b15786d39d3116c57eb7a40922bc3e3c90b4991f2bfa56a11fb1985e6d222d2e30c051dfb700fb535c89d0492671c638b5457c5268023367cdb@127.0.0.1:30299 --datadir=";
 	systemString += datadir;
-	systemString += " --identity mynode-";
+	systemString += " --identity='mynode-";
 	systemString += stringId;
-	systemString += " --port ";
+	systemString += "' --port=";
 	systemString += stringId;
-	systemString += " --password <(echo -n ";
-	systemString += stringId;
-	systemString += ") --rpc --rpcapi=\"db,eth,net,web3,personal\" --rpcport ";
+	systemString += " --rpc --rpcapi='db,eth,net,web3,admin,personal' --rpcport=";
 	systemString += stringPort;
-	systemString += " --ipcpath ";
+	systemString += " --rpcaddr=127.0.0.1 --rpccorsdomain='*' --ipcpath ";
 	systemString += datadir;
-	systemString += "/geth.ipc --networkid 1923 2>&1 &\"";
+	systemString += "/geth.ipc --networkid=1923 2>&1 &\"";
 
 	cout << systemString << endl;
 	const char * systemCommand = systemString.c_str();
@@ -173,7 +171,6 @@ void blockNode::startNode(int id) {
 			cout << "accounts : " << accounts << endl;
 			created = true;
 		} catch (jsonrpc::JsonRpcException& e) {
-			cout << "error getting eth_accounts " << e.GetMessage() << endl;
 			created = false;
 		}
 	}
@@ -194,7 +191,7 @@ void blockNode::startNode(int id) {
 		Json::Value root; // {}
 		root["from"] = "0xad56cedb7d9ee48b3b93f682a9e2d87f80221768";
 		root["to"] = accounts[0];
-		root["value"] = "0x9184e72a"; // 2441406250
+		root["value"] = "0x1BC16D674EC80000"; // 2000000000000000000 = 2Eth
 		market.eth_sendTransaction(root);
 	}
 	catch (jsonrpc::JsonRpcException & e)
@@ -263,7 +260,7 @@ void blockNode::submitConsumptionBid(int id, int price, int quantity){
 	std::string stringId(ss.str());
 
 
-	cout << "httpclient http://localhost:" + stringPort << "nodeId "<< nodeId << endl;
+	cout << "submitConsumptionBid httpclient http://localhost:" + stringPort << "nodeId "<< nodeId << endl;
 
 	jsonrpc::HttpClient httpclient("http://localhost:" + stringPort);
 	EthereumAPI c(httpclient);
@@ -311,26 +308,62 @@ void blockNode::submitConsumptionBid(int id, int price, int quantity){
 
 //"0d31d41a": "generationBid(int256,int256)",
 void blockNode::submitGenerationBid(int id, int price, int quantity){
-	cout << "submitConsumptionBid price:" << price << " quantity:" << quantity << endl;
-	jsonrpc::HttpClient httpclient("http://localhost:8100");
-		EthereumAPI c(httpclient);
-		try
-		{
-			//contract address: 0xf176c2f03773b63a6e3659423d7380bfa276dcb3
-			//default account : 0xad56cedb7d9ee48b3b93f682a9e2d87f80221768
-			// 027cb7c6 clear();
-			//Json::Value result = "\"from\": \"0x1d1ae163d75d6689c6c70c7367bbd08ac5361e4e\", \"to\": \"0x35bc45bb2c4c8f311ed9e0e867287ecb9ca90f8b\", \"data\": \"0x256a9ea1\"";
-			Json::Value root; // {}
-			root["from"] = "0xad56cedb7d9ee48b3b93f682a9e2d87f80221768";
-			root["to"] = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
-			root["data"] = "0x7f495ea5";
-			c.eth_call(root,"latest");
-			//cout << c.eth_accounts() << endl;
-		}
-		catch (jsonrpc::JsonRpcException & e)
-		{
-			cerr << e.what() << endl;
-		}
+	//comment out when gas problem solved
+	nodeId = 30300 + id;
+	rpcPort = 8101 + id;
+
+	std::stringstream sp;
+	sp << rpcPort;
+	std::string stringPort(sp.str());
+
+	std::stringstream ss;
+	ss << nodeId;
+	std::string stringId(ss.str());
+
+
+	cout << "submitGenerationBid httpclient http://localhost:" + stringPort << "nodeId "<< nodeId << endl;
+
+	jsonrpc::HttpClient httpclient("http://localhost:" + stringPort);
+	EthereumAPI c(httpclient);
+	Json::Value accounts = c.eth_accounts();
+	cout << "accounts : " << accounts[0] << endl;
+
+	//UnlockAccount
+	try {
+		string address = accounts[0].asString();
+		c.personal_unlockAccount(address, stringId, 0);
+	} catch (jsonrpc::JsonRpcException& e) {
+		cout << "error unlocking account " << e.GetMessage() << endl;
+	}
+
+
+
+	std::stringstream stream;
+	stream << setfill('0') << setw(64) << std::hex << price;
+	std::string resultprice( stream.str() );
+
+	stream << setfill('0') << setw(64) << std::hex << quantity;
+	std::string resultquantity( stream.str() );
+
+	cout << "submitGenerationBid priceHEX:" << resultprice << " quantityHEX:" << resultquantity << endl;
+
+	try
+	{
+		//contract address: 0xf176c2f03773b63a6e3659423d7380bfa276dcb3
+		//default account : 0xad56cedb7d9ee48b3b93f682a9e2d87f80221768
+		// 027cb7c6 clear();
+		//Json::Value result = "\"from\": \"0x1d1ae163d75d6689c6c70c7367bbd08ac5361e4e\", \"to\": \"0x35bc45bb2c4c8f311ed9e0e867287ecb9ca90f8b\", \"data\": \"0x256a9ea1\"";
+		Json::Value root; // {}
+		root["from"] = accounts[0];
+		root["to"] = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
+		root["data"] = "0x0d31d41a"+resultquantity+resultprice;
+		c.eth_sendTransaction(root);
+		//cout << c.eth_accounts() << endl;
+	}
+	catch (jsonrpc::JsonRpcException & e)
+	{
+		cerr << e.what() << endl;
+	}
 }
 
 blockNode::blockNode() {

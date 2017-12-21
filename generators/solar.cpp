@@ -115,6 +115,8 @@ solar::solar(MODULE *module)
 			PT_complex, "VA_Out[VA]", PADDR(VA_Out),
 			PT_object, "weather", PADDR(weather),
 
+			PT_double, "price[$]", PADDR(price), PT_DESCRIPTION, "bid_price",
+
 			PT_double, "shading_factor[pu]", PADDR(shading_factor), PT_DESCRIPTION, "Shading factor for scaling solar power to the array",
 			PT_double, "tilt_angle[deg]", PADDR(tilt_angle), PT_DESCRIPTION, "Tilt angle of PV array",
 			PT_double, "orientation_azimuth[deg]", PADDR(orientation_azimuth), PT_DESCRIPTION, "Facing direction of the PV array",

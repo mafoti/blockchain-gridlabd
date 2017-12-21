@@ -20,6 +20,7 @@ protected:
 
 public:
 	/* TODO: put published variables here */
+	double price;
 	set phases;	/**< device phases (see PHASE codes) */
 	enum GENERATOR_MODE {CONSTANT_V=1, CONSTANT_PQ=2, CONSTANT_PF=4, SUPPLY_DRIVEN=5};
 	enumeration gen_mode_v;  //operating mode of the generator 

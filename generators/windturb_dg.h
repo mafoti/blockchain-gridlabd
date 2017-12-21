@@ -53,6 +53,7 @@ protected:
 
 public:
 	/* TODO: put published variables here */
+	double price;
 	set phases;	/**< device phases (see PHASE codes) */
 
 	complex power_A;//power

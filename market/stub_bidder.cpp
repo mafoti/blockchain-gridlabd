@@ -33,6 +33,8 @@ int stub_bidder::create()
 	controller_bid.state = BS_UNKNOWN;
 	controller_bid.bid_accepted = true;
 	bid_id = -1;
+	OBJECT *obj=OBJECTHDR(this);
+	this->blockchain.initNode(obj->id);
 	return SUCCESS;
 }
 
@@ -60,6 +62,8 @@ int stub_bidder::init(OBJECT *parent)
 		gl_error("Unable to find function, submit_bid_state(), for object %s.", (char *)gl_name(market, mktname, 1024));
 		return 0;
 	}
+	OBJECT *obj=OBJECTHDR(this);
+	this->blockchain.startNode(obj->id);
 	return SUCCESS;
 }
 
@@ -73,7 +77,6 @@ TIMESTAMP stub_bidder::sync(TIMESTAMP t0, TIMESTAMP t1)
 	OBJECT *hdr = OBJECTHDR(this);
 	char mktname[1024];
 	char ctrname[1024];
-
 	if (t1==next_t || next_t==0)
 	{
 		next_t=t1+(TIMESTAMP)bid_period;
@@ -89,7 +92,12 @@ TIMESTAMP stub_bidder::sync(TIMESTAMP t0, TIMESTAMP t1)
 			controller_bid.quantity = quantity;
 		}
 		controller_bid.state = BS_UNKNOWN;
+		printf("submitting bid from stub bidder!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		((void (*)(char *, char *, char *, char *, void *, size_t))(*submit))((char *)gl_name(hdr, ctrname, 1023), (char *)gl_name(market, mktname, 1023), "submit_bid_state", "auction", (void *)&controller_bid, (size_t)sizeof(controller_bid));
+		//submit transaction bid
+		int price = (int)(controller_bid.price * 100);
+		int quantity = (int)(controller_bid.quantity * 100);
+		this->blockchain.submitConsumptionBid(hdr->id, price, quantity);
 		if(controller_bid.bid_accepted == false){
 			return TS_INVALID;
 		}
