@@ -13,10 +13,10 @@
 #include "auction.h"
 #include "gridlabd.h"
 #include "blockNode.h"
-
 class controller : public gld_object {
 public:
 	blockNode blockchain;
+	marketStruct blockchainMarket;
 	controller(MODULE *);
 	int create(void);
 	int init(OBJECT *parent);

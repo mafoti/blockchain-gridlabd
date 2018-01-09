@@ -92,7 +92,7 @@ TIMESTAMP stub_bidder::sync(TIMESTAMP t0, TIMESTAMP t1)
 			controller_bid.quantity = quantity;
 		}
 		controller_bid.state = BS_UNKNOWN;
-		printf("submitting bid from stub bidder!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
 		((void (*)(char *, char *, char *, char *, void *, size_t))(*submit))((char *)gl_name(hdr, ctrname, 1023), (char *)gl_name(market, mktname, 1023), "submit_bid_state", "auction", (void *)&controller_bid, (size_t)sizeof(controller_bid));
 		//submit transaction bid
 		int price = (int)(controller_bid.price * 100);

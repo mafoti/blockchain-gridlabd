@@ -143,7 +143,7 @@ void blockNode::startNode(int id) {
 	std::string root = "/home/ubuntu/tmp/eth/1923";
 	std::string datadir = root + "/data/" + stringId;
 
-	string systemString = "bash -c \"geth --bootnodes enode://ad625f1c7ece8b15786d39d3116c57eb7a40922bc3e3c90b4991f2bfa56a11fb1985e6d222d2e30c051dfb700fb535c89d0492671c638b5457c5268023367cdb@127.0.0.1:30299 --datadir=";
+	string systemString = "bash -c \"geth --bootnodes enode://ee883cc0b2d1811f74aadab89216caf908409ed1d654f8303d1d6139acb87a70ade89e18d55149f16256164086098ba6f00e93b01b7d2104b71581ea83e8479e@127.0.0.1:30299 --datadir=";
 	systemString += datadir;
 	systemString += " --identity='mynode-";
 	systemString += stringId;
@@ -203,42 +203,29 @@ void blockNode::startNode(int id) {
 
 
 void blockNode::clearMarket(int id){
-
+	cout << "MARKET CLEARING CALLED " << endl;
 	jsonrpc::HttpClient httpclient("http://localhost:8100");
 	EthereumAPI c(httpclient);
-
-	/*Json::Value accounts;
-
-	bool created = false;
-	while (!created) {
-		try {
-			accounts = c.eth_accounts();
-			cout << "accounts : " << accounts << endl;
-			created = true;
-		} catch (jsonrpc::JsonRpcException& e) {
-			cout << "error getting eth_accounts " << e.GetMessage() << endl;
-			created = false;
-		}
-	}*/
 
 	try {
 		//string address = accounts[0].asString();
 		string address = "0xad56cedb7d9ee48b3b93f682a9e2d87f80221768";
 		c.personal_unlockAccount(address, "0", 0);
+		cout << "ACCOUNT UNLOCKED " << endl;
 	} catch (jsonrpc::JsonRpcException& e) {
-		cout << "error unlocking account " << e.GetMessage() << endl;
+		cout << "ERROR UNLOCKING ACCOUNT " << e.GetMessage() << endl;
 	}
 
 	try
 	{
-		//contract address: 0xf176c2f03773b63a6e3659423d7380bfa276dcb3
+		//contract address: 0x4291ae232bcbeb5a64b612a971384efac3dab88d
 		//default account : 0xad56cedb7d9ee48b3b93f682a9e2d87f80221768
 		Json::Value root; // {}
 		root["from"] = "0xad56cedb7d9ee48b3b93f682a9e2d87f80221768";
-		root["to"] = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
+		root["to"] = "0x0f0a020a9545abc51b6c18b86bcdbdd4c7382dcf";
 		root["data"] = "0x256a9ea1";
 		string result = c.eth_sendTransaction(root);
-		cout << "market clearing result : " << result << endl;
+		cout << "MARKET CLEARING HASH : " << result << endl;
 	}
 	catch (jsonrpc::JsonRpcException & e)
 	{
@@ -288,13 +275,13 @@ void blockNode::submitConsumptionBid(int id, int price, int quantity){
 
 	try
 	{
-		//contract address: 0xf176c2f03773b63a6e3659423d7380bfa276dcb3
+		//contract address: 0x4291ae232bcbeb5a64b612a971384efac3dab88d
 		//default account : 0xad56cedb7d9ee48b3b93f682a9e2d87f80221768
 		// 027cb7c6 clear();
 		//Json::Value result = "\"from\": \"0x1d1ae163d75d6689c6c70c7367bbd08ac5361e4e\", \"to\": \"0x35bc45bb2c4c8f311ed9e0e867287ecb9ca90f8b\", \"data\": \"0x256a9ea1\"";
 		Json::Value root; // {}
 		root["from"] = accounts[0];
-		root["to"] = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
+		root["to"] = "0x0f0a020a9545abc51b6c18b86bcdbdd4c7382dcf";
 		root["data"] = "0x7f495ea5"+resultquantity+resultprice;
 		c.eth_sendTransaction(root);
 		//cout << c.eth_accounts() << endl;
@@ -349,13 +336,13 @@ void blockNode::submitGenerationBid(int id, int price, int quantity){
 
 	try
 	{
-		//contract address: 0xf176c2f03773b63a6e3659423d7380bfa276dcb3
+		//contract address: 0x4291ae232bcbeb5a64b612a971384efac3dab88d
 		//default account : 0xad56cedb7d9ee48b3b93f682a9e2d87f80221768
 		// 027cb7c6 clear();
 		//Json::Value result = "\"from\": \"0x1d1ae163d75d6689c6c70c7367bbd08ac5361e4e\", \"to\": \"0x35bc45bb2c4c8f311ed9e0e867287ecb9ca90f8b\", \"data\": \"0x256a9ea1\"";
 		Json::Value root; // {}
 		root["from"] = accounts[0];
-		root["to"] = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
+		root["to"] = "0x0f0a020a9545abc51b6c18b86bcdbdd4c7382dcf";
 		root["data"] = "0x0d31d41a"+resultquantity+resultprice;
 		c.eth_sendTransaction(root);
 		//cout << c.eth_accounts() << endl;
@@ -364,6 +351,49 @@ void blockNode::submitGenerationBid(int id, int price, int quantity){
 	{
 		cerr << e.what() << endl;
 	}
+}
+
+marketStruct blockNode::readClearing(int id) {
+	marketStruct market = marketStruct();
+	nodeId = 30300 + id;
+	rpcPort = 8101 + id;
+
+	std::stringstream sp;
+	sp << rpcPort;
+	std::string stringPort(sp.str());
+
+	std::stringstream ss;
+	ss << nodeId;
+	std::string stringId(ss.str());
+
+	jsonrpc::HttpClient httpclient("http://localhost:" + stringPort);
+	EthereumAPI c(httpclient);
+	Json::Value accounts = c.eth_accounts();
+
+	try{
+		Json::Value root; // {}
+		root["from"] = accounts[0];
+		root["to"] = "0x0f0a020a9545abc51b6c18b86bcdbdd4c7382dcf";
+		root["data"] = "0x901a40a7";
+
+		string result = c.eth_call(root, "latest");
+		int price = strtoul(result.c_str(), NULL, 16);
+		cout << "get market result : " << price << endl;
+	}
+	catch (jsonrpc::JsonRpcException & e)
+	{
+		cerr << e.what() << endl;
+	}
+
+	/*market.price = result["clearingPrice"].asInt();
+	market.quantity = result["clearingQuantity"].asInt();
+	market.type = result["clearingType"].asInt();*/
+
+	market.price = 10;
+	market.quantity = 100;
+	market.type = 0;
+
+	return market;
 }
 
 blockNode::blockNode() {
