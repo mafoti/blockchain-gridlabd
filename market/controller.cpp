@@ -1043,7 +1043,7 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 	double coolDemand = 0.0;
 	if(bidmode != BM_PROXY){
 		blockchainMarket = this->blockchain.readClearing(hdr->id);
-		printf("market.clearing = %d !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", blockchainMarket.price);
+		//printf("market.clearing = %d !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", blockchainMarket.price);
 		pAvg->getp(avgP);
 		pStd->getp(stdP);
 		pMarketId->getp(marketId);

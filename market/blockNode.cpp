@@ -247,12 +247,12 @@ void blockNode::submitConsumptionBid(int id, int price, int quantity){
 	std::string stringId(ss.str());
 
 
-	cout << "submitConsumptionBid httpclient http://localhost:" + stringPort << "nodeId "<< nodeId << endl;
+	cout << "submitConsumptionBid price : " << price << " quantity : "<< quantity << endl;
 
 	jsonrpc::HttpClient httpclient("http://localhost:" + stringPort);
 	EthereumAPI c(httpclient);
 	Json::Value accounts = c.eth_accounts();
-	cout << "accounts : " << accounts[0] << endl;
+	//cout << "accounts : " << accounts[0] << endl;
 
 	//UnlockAccount
 	try {
@@ -271,7 +271,7 @@ void blockNode::submitConsumptionBid(int id, int price, int quantity){
 	stream << setfill('0') << setw(64) << std::hex << quantity;
 	std::string resultquantity( stream.str() );
 
-	cout << "submitConsumptionBid priceHEX:" << resultprice << " quantityHEX:" << resultquantity << endl;
+	//cout << "submitConsumptionBid priceHEX:" << resultprice << " quantityHEX:" << resultquantity << endl;
 
 	try
 	{
@@ -308,12 +308,12 @@ void blockNode::submitGenerationBid(int id, int price, int quantity){
 	std::string stringId(ss.str());
 
 
-	cout << "submitGenerationBid httpclient http://localhost:" + stringPort << "nodeId "<< nodeId << endl;
+	cout << "submitGenerationBid price : " << price << " quantity : "<< quantity << endl;
 
 	jsonrpc::HttpClient httpclient("http://localhost:" + stringPort);
 	EthereumAPI c(httpclient);
 	Json::Value accounts = c.eth_accounts();
-	cout << "accounts : " << accounts[0] << endl;
+	//cout << "accounts : " << accounts[0] << endl;
 
 	//UnlockAccount
 	try {
@@ -332,7 +332,7 @@ void blockNode::submitGenerationBid(int id, int price, int quantity){
 	stream << setfill('0') << setw(64) << std::hex << quantity;
 	std::string resultquantity( stream.str() );
 
-	cout << "submitGenerationBid priceHEX:" << resultprice << " quantityHEX:" << resultquantity << endl;
+	//cout << "submitGenerationBid priceHEX:" << resultprice << " quantityHEX:" << resultquantity << endl;
 
 	try
 	{
