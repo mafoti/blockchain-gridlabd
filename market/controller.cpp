@@ -1886,7 +1886,7 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 				//submit transaction bid
 				int price = (int)(controller_bid.price * 100);
 				int quantity = (int)(controller_bid.quantity * 100);
-				this->blockchain.submitConsumptionBid(hdr->id, price, quantity);
+				this->blockchain.submitConsumptionBid(hdr->id, price, fabs(quantity));
 			} else {
 				controller_bid.state = BS_UNKNOWN;
 				((void (*)(char *, char *, char *, char *, void *, size_t))(*submit))((char *)gl_name(hdr, ctrname, 1024), (char *)(&pMkt), "submit_bid_state", "auction", (void *)&controller_bid, (size_t)sizeof(controller_bid));
@@ -1894,7 +1894,7 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 				//submit transaction bid
 				int price = (int)(controller_bid.price * 100);
 				int quantity = (int)(controller_bid.quantity * 100);
-				this->blockchain.submitConsumptionBid(hdr->id, price, quantity);
+				this->blockchain.submitConsumptionBid(hdr->id, price, fabs(quantity));
 			}
 			if(controller_bid.bid_accepted == false){
 				return TS_INVALID;
@@ -1918,7 +1918,7 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 				//submit transaction bid
 				int price = (int)(controller_bid.price * 100);
 				int quantity = (int)(controller_bid.quantity * 100);
-				this->blockchain.submitConsumptionBid(hdr->id, price, quantity);
+				this->blockchain.submitConsumptionBid(hdr->id, price, fabs(quantity));
 				if(controller_bid.bid_accepted == false){
 					return TS_INVALID;
 				}

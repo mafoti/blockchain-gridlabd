@@ -97,7 +97,7 @@ TIMESTAMP stub_bidder::sync(TIMESTAMP t0, TIMESTAMP t1)
 		//submit transaction bid
 		int price = (int)(controller_bid.price * 100);
 		int quantity = (int)(controller_bid.quantity * 100);
-		this->blockchain.submitGenerationBid(hdr->id, price, quantity);
+		this->blockchain.submitGenerationBid(hdr->id, price, fabs(quantity));
 		if(controller_bid.bid_accepted == false){
 			return TS_INVALID;
 		}

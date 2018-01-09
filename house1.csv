@@ -1,5 +1,5 @@
 # file...... house1.csv
-# date...... Tue Jan  9 12:12:41 2018
+# date...... Tue Jan  9 14:09:31 2018
 # user...... ubuntu
 # host...... (null)
 # target.... controller 24
@@ -7,4 +7,5 @@
 # interval.. 60
 # limit..... -2147483648
 # timestamp,bid_price,bid_quantity,house1:power_state,house1:air_temperature,house1:system_mode,house1:hvac_load,house1:outdoor_temperature
-2018-01-09 10:12:39 UTC,+5.14,+0,ON,+74,COOL,+3.3661,+41.002
+2018-01-09 12:09:28 UTC,+5.14,+0,ON,+74,COOL,+3.43535,+42.082
+2018-01-09 12:10:28 UTC,+3.43309,+3.43528,ON,+72.7701,COOL,+3.43528,+42.082
