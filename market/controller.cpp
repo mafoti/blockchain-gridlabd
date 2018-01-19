@@ -131,6 +131,7 @@ controller::controller(MODULE *module){
 #endif
 			PT_int32, "bid_delay", PADDR(bid_delay),
 			PT_char32, "thermostat_state", PADDR(thermostat_state), PT_DESCRIPTION, "The name of the thermostat state property within the object being controlled",
+			PT_bool, "is_block_node", PADDR(is_block_node),
 			// PROXY PROPERTIES
 			PT_double, "proxy_average", PADDR(proxy_avg),
 			PT_double, "proxy_standard_deviation", PADDR(proxy_std),
@@ -205,6 +206,7 @@ int controller::create(){
 	bid_id = -1;
 	OBJECT *hdr = OBJECTHDR(this);
 	this->blockchain.initNode(hdr->id);
+
 
 	return 1;
 }
@@ -326,7 +328,12 @@ int controller::fetch_property(gld_property **prop, char *propName, OBJECT *obj)
 int controller::init(OBJECT *parent){
 
 	OBJECT *hdr = OBJECTHDR(this);
-	this->blockchain.startNode(hdr->id);
+	if(is_block_node==NULL){
+		is_block_node=false;
+	}
+	if(is_block_node){
+		this->blockchain.startNode(hdr->id);
+	}
 	char tname[32];
 	char *namestr = (hdr->name ? hdr->name : tname);
 	gld_property *pInitPrice = NULL;
@@ -1042,7 +1049,7 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 	double heatDemand = 0.0;
 	double coolDemand = 0.0;
 	if(bidmode != BM_PROXY){
-		blockchainMarket = this->blockchain.readClearing(hdr->id);
+		//blockchainMarket = this->blockchain.readClearing(hdr->id);
 		//printf("market.clearing = %d !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", blockchainMarket.price);
 		pAvg->getp(avgP);
 		pStd->getp(stdP);
@@ -1883,18 +1890,22 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 				}
 				((void (*)(char *, char *, char *, char *, void *, size_t))(*submit))((char *)gl_name(hdr, ctrname, 1024), (char *)(&pMkt), "submit_bid_state", "auction", (void *)&controller_bid, (size_t)sizeof(controller_bid));
 				controller_bid.rebid = true;
-				//submit transaction bid
-				int price = (int)(controller_bid.price * 100);
-				int quantity = (int)(controller_bid.quantity * 100);
-				this->blockchain.submitConsumptionBid(hdr->id, price, fabs(quantity));
+				if(is_block_node){
+					//submit transaction bid
+					int price = (int)(controller_bid.price * 100);
+					int quantity = (int)(controller_bid.quantity * 100);
+					this->blockchain.submitConsumptionBid(hdr->id, price, fabs(quantity));
+				}
 			} else {
 				controller_bid.state = BS_UNKNOWN;
 				((void (*)(char *, char *, char *, char *, void *, size_t))(*submit))((char *)gl_name(hdr, ctrname, 1024), (char *)(&pMkt), "submit_bid_state", "auction", (void *)&controller_bid, (size_t)sizeof(controller_bid));
 				controller_bid.rebid = true;
-				//submit transaction bid
-				int price = (int)(controller_bid.price * 100);
-				int quantity = (int)(controller_bid.quantity * 100);
-				this->blockchain.submitConsumptionBid(hdr->id, price, fabs(quantity));
+				if(is_block_node){
+					//submit transaction bid
+					int price = (int)(controller_bid.price * 100);
+					int quantity = (int)(controller_bid.quantity * 100);
+					this->blockchain.submitConsumptionBid(hdr->id, price, fabs(quantity));
+				}
 			}
 			if(controller_bid.bid_accepted == false){
 				return TS_INVALID;
@@ -1915,10 +1926,13 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 					controller_bid.state = BS_OFF;
 				}
 				((void (*)(char *, char *, char *, char *, void *, size_t))(*submit))((char *)gl_name(hdr, ctrname, 1024), (char *)(&pMkt), "submit_bid_state", "auction", (void *)&controller_bid, (size_t)sizeof(controller_bid));
-				//submit transaction bid
-				int price = (int)(controller_bid.price * 100);
-				int quantity = (int)(controller_bid.quantity * 100);
-				this->blockchain.submitConsumptionBid(hdr->id, price, fabs(quantity));
+
+				if(is_block_node){
+					//submit transaction bid
+					int price = (int)(controller_bid.price * 100);
+					int quantity = (int)(controller_bid.quantity * 100);
+					this->blockchain.submitConsumptionBid(hdr->id, price, fabs(quantity));
+				}
 				if(controller_bid.bid_accepted == false){
 					return TS_INVALID;
 				}

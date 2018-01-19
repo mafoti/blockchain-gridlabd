@@ -55,6 +55,7 @@ typedef enum {
 class auction : public gld_object {
 public:
 	blockNode blockchain;
+	bool is_block_node;
 	bool verbose;
 	bool use_future_mean_price;
 	typedef enum {ST_ON=0, ST_OFF=1} STATISTICMODE;

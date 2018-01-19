@@ -17,6 +17,7 @@ class controller : public gld_object {
 public:
 	blockNode blockchain;
 	marketStruct blockchainMarket;
+	bool is_block_node;
 	controller(MODULE *);
 	int create(void);
 	int init(OBJECT *parent);

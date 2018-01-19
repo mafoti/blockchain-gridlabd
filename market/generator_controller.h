@@ -10,12 +10,15 @@
 #define _GENCONTROLLER_H
 
 #include "auction.h"
+#include "blockNode.h"
 
 class generator_controller : public gld_object 
 {
 public:
 	static CLASS *oclass;
 public:
+	blockNode blockchain;
+	bool is_block_node;
 	typedef struct s_curvedetails {	//Declare in here in case we ever need it externally
 		double power_start;		/// Starting point of this linear section
 		double power_stop;		/// Stopping point of this linear section

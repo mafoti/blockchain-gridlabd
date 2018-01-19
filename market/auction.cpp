@@ -83,6 +83,7 @@ auction::auction(MODULE *module)
 			oclass->trl = TRL_QUALIFIED;
 
 		if (gl_publish_variable(oclass,
+			PT_bool, "is_block_node", PADDR(is_block_node),
 			PT_char32, "unit", PADDR(unit), PT_DESCRIPTION, "unit of quantity",
 			PT_double, "period[s]", PADDR(dPeriod), PT_DESCRIPTION, "interval of time between market clearings",
 			PT_double, "latency[s]", PADDR(dLatency), PT_DESCRIPTION, "latency between market clearing and delivery", 
@@ -238,8 +239,11 @@ int auction::create(void)
 		gl_set_value(OBJECTHDR(this), stat->prop, val);
 	}
 	statistic_mode = ST_ON;
+	printf("auction create method, call to blockchain.init? %d\n",is_block_node);
+
 	OBJECT *obj=OBJECTHDR(this);
 	this->blockchain.initNode(obj->id);
+
 	return 1; /* return 1 on success, 0 on failure */
 }
 
@@ -248,7 +252,12 @@ int auction::init(OBJECT *parent)
 {
 
 	OBJECT *obj=OBJECTHDR(this);
-	this->blockchain.startNode(obj->id);
+	if(is_block_node==NULL){
+		is_block_node=false;
+	}
+	if(is_block_node){
+		this->blockchain.startNode(obj->id);
+	}
 	unsigned int i = 0;
 	if(capacity_reference_object != NULL){
 		if(obj->rank <= capacity_reference_object->rank){
@@ -866,7 +875,9 @@ void auction::record_curve(double bu, double su){
 void auction::clear_market(void)
 {
 	OBJECT *obj=OBJECTHDR(this);
-	this->blockchain.clearMarket(obj->id);
+	if(is_block_node){
+		this->blockchain.clearMarket(obj->id);
+	}
 	unsigned int sph24 = (unsigned int)(3600/period*24);
 	BID unresponsive;
 	extern double bid_offset;

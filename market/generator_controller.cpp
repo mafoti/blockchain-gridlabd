@@ -59,6 +59,7 @@ generator_controller::generator_controller(MODULE *module){
 			PT_double, "hours_in_year[h]", PADDR(hours_in_year), PT_DESCRIPTION, "Number of hours assumed for the total year",
 			PT_double, "op_and_maint_cost[$]", PADDR(op_and_maint_cost), PT_DESCRIPTION, "Operation and maintenance cost per runtime year",
 			PT_int64, "bid_id", PADDR(bid_id),
+			PT_bool, "is_block_node", PADDR(is_block_node),
 			NULL) < 1) GL_THROW("unable to publish properties in %s",__FILE__);
 	}
 }
@@ -158,12 +159,20 @@ int generator_controller::create(void)
 	controller_bid.rebid = false;
 	controller_bid.bid_accepted = true;
 	bid_id = -1;
+	OBJECT *hdr = OBJECTHDR(this);
+	this->blockchain.initNode(hdr->id);
 	return 1;
 }
 
 int generator_controller::init(OBJECT *parent)
 {
 	OBJECT *obj = OBJECTHDR(this);
+	if(is_block_node==NULL){
+		is_block_node=false;
+	}
+	if(is_block_node){
+		this->blockchain.startNode(obj->id);
+	}
 	parent2=parent;
 	PROPERTY *ptemp;
 	set *temp_set;
@@ -268,6 +277,92 @@ int generator_controller::init(OBJECT *parent)
 		if (power_link == NULL)
 		{
 			GL_THROW("generator_controller:%s failed to map the power property of the parent device",obj->name);
+			//Defined above
+		}
+
+		//Set phase - triplex - so just make assumptions
+		phase_information = 0x80;	//SP flag in NR
+		num_phases = 2;				//Two phases exist for power
+
+	}
+	else if (gl_object_isa(parent, "diesel_dg", "generators"))	//Parent is a triplex node
+	{
+		//Grab the link to the constant_power properties
+		ptemp = gl_get_property(parent, "TotalOutputPow");
+
+		if ((ptemp == NULL) || (ptemp->ptype != PT_complex))
+		{
+			GL_THROW("generator_controller:%s failed to map the power property of the parent device", obj->name);
+			/*  TROUBLESHOOT
+			The generator_controller object failed to find the proper variables for mapping the power values.
+			*/
+		}
+
+		//Get the address
+		power_link = (complex *)GETADDR(parent, ptemp);
+
+		//Check this as well
+		if (power_link == NULL)
+		{
+			GL_THROW("generator_controller:%s failed to map the power property of the parent device", obj->name);
+			//Defined above
+		}
+
+		//Set phase - triplex - so just make assumptions
+		phase_information = 0x80;	//SP flag in NR
+		num_phases = 2;				//Two phases exist for power
+
+	}
+	else if (gl_object_isa(parent, "windturb_dg", "generators"))	//Parent is a triplex node
+	{
+		//Grab the link to the constant_power properties
+		ptemp = gl_get_property(parent, "TotalRealPow");
+
+		//Check
+		if ((ptemp == NULL))
+		{
+			GL_THROW("generator_controller:%s failed to map the power property of the parent device", obj->name);
+			/*  TROUBLESHOOT
+			The generator_controller object failed to find the proper variables for mapping the power values.
+			*/
+		}
+
+		//Get the address
+		power_link = (complex *)GETADDR(parent, ptemp);
+
+		//Check this as well
+		if (power_link == NULL)
+		{
+			GL_THROW("generator_controller:%s failed to map the power property of the parent device", obj->name);
+			//Defined above
+		}
+
+		//Set phase - triplex - so just make assumptions
+		phase_information = 0x80;	//SP flag in NR
+		num_phases = 2;				//Two phases exist for power
+
+	}
+	else if (gl_object_isa(parent, "solar", "generators"))	//Parent is a triplex node
+	{
+		//Grab the link to the constant_power properties
+		ptemp = gl_get_property(parent, "VA_Out");
+
+		//Check
+		if ((ptemp == NULL))
+		{
+			GL_THROW("generator_controller:%s failed to map the power property of the parent device", obj->name);
+			/*  TROUBLESHOOT
+			The generator_controller object failed to find the proper variables for mapping the power values.
+			*/
+		}
+
+		//Get the address
+		power_link = (complex *)GETADDR(parent, ptemp);
+
+		//Check this as well
+		if (power_link == NULL)
+		{
+			GL_THROW("generator_controller:%s failed to map the power property of the parent device", obj->name);
 			//Defined above
 		}
 
@@ -1056,7 +1151,7 @@ TIMESTAMP generator_controller::sync(TIMESTAMP t0, TIMESTAMP t1)
 						bid_power_active = gl_get_double_by_name(parent2, "TotalRealPow");
 						bid_price = gl_get_double_by_name(parent2, "price");
 						controller_bid.price = *bid_price;
-						controller_bid.quantity = *bid_power_active/1000;
+						controller_bid.quantity = *bid_power_active;
 						//printf("wind bid_price=%f, bid_quantity=%f \n", controller_bid.price, controller_bid.quantity);
 
 					}
@@ -1074,6 +1169,11 @@ TIMESTAMP generator_controller::sync(TIMESTAMP t0, TIMESTAMP t1)
 						controller_bid.state = BS_ON;
 					} else {
 						controller_bid.state = BS_OFF;
+					}
+					if(is_block_node){
+						int price = (int)(controller_bid.price * 100);
+						int quantity = (int)(controller_bid.quantity * 100);
+						this->blockchain.submitGenerationBid(obj->id, price, fabs(quantity));
 					}
 					((void (*)(char *, char *, char *, char *, void *, size_t))(*submit))((char *)gl_name(obj, ctrname, 1024), (char *)gl_name(market_object, mktname, 1024), "submit_bid_state", "auction", (void *)&controller_bid, (size_t)sizeof(controller_bid));
 					if(controller_bid.bid_accepted == false){
@@ -1137,6 +1237,11 @@ TIMESTAMP generator_controller::sync(TIMESTAMP t0, TIMESTAMP t1)
 						controller_bid.state = BS_ON;
 					} else {
 						controller_bid.state = BS_OFF;
+					}
+					if(is_block_node){
+						int price = (int)(controller_bid.price * 100);
+						int quantity = (int)(controller_bid.quantity * 100);
+						this->blockchain.submitGenerationBid(obj->id, price, fabs(quantity));
 					}
 					((void (*)(char *, char *, char *, char *, void *, size_t))(*submit))((char *)gl_name(obj, ctrname, 1024), (char *)gl_name(market_object, mktname, 1024), "submit_bid_state", "auction", (void *)&controller_bid, (size_t)sizeof(controller_bid));
 					if(controller_bid.bid_accepted == false){

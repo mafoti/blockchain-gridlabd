@@ -17,6 +17,7 @@ public:
 	static CLASS *oclass;
 public:
 	blockNode blockchain;
+	bool is_block_node;
 	double bid_period;
 	int16 count;
 	OBJECT *market;

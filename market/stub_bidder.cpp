@@ -11,6 +11,7 @@ stub_bidder::stub_bidder(MODULE *module)
 			GL_THROW("unable to register object class implemented by %s", __FILE__);
 
 		if (gl_publish_variable(oclass,
+				PT_bool, "is_block_node", PADDR(is_block_node),
 				PT_double, "bid_period[s]", PADDR(bid_period),
 				PT_int16, "count", PADDR(count),
 				PT_object, "market", PADDR(market),
@@ -62,8 +63,13 @@ int stub_bidder::init(OBJECT *parent)
 		gl_error("Unable to find function, submit_bid_state(), for object %s.", (char *)gl_name(market, mktname, 1024));
 		return 0;
 	}
-	OBJECT *obj=OBJECTHDR(this);
-	this->blockchain.startNode(obj->id);
+	if(is_block_node==NULL){
+		is_block_node=false;
+	}
+	if(is_block_node){
+		OBJECT *obj=OBJECTHDR(this);
+		this->blockchain.startNode(obj->id);
+	}
 	return SUCCESS;
 }
 
@@ -94,10 +100,12 @@ TIMESTAMP stub_bidder::sync(TIMESTAMP t0, TIMESTAMP t1)
 		controller_bid.state = BS_UNKNOWN;
 
 		((void (*)(char *, char *, char *, char *, void *, size_t))(*submit))((char *)gl_name(hdr, ctrname, 1023), (char *)gl_name(market, mktname, 1023), "submit_bid_state", "auction", (void *)&controller_bid, (size_t)sizeof(controller_bid));
-		//submit transaction bid
-		int price = (int)(controller_bid.price * 100);
-		int quantity = (int)(controller_bid.quantity * 100);
-		this->blockchain.submitGenerationBid(hdr->id, price, fabs(quantity));
+		if(is_block_node){
+			//submit transaction bid
+			int price = (int)(controller_bid.price * 100);
+			int quantity = (int)(controller_bid.quantity * 100);
+			this->blockchain.submitGenerationBid(hdr->id, price, fabs(quantity));
+		}
 		if(controller_bid.bid_accepted == false){
 			return TS_INVALID;
 		}

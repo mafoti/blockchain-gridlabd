@@ -1,5 +1,5 @@
 # file...... market_1.csv
-# date...... Tue Jan  9 14:09:31 2018
+# date...... Thu Jan 18 14:56:28 2018
 # user...... ubuntu
 # host...... (null)
 # target.... auction 0
@@ -7,5 +7,5 @@
 # interval.. 60
 # limit..... -2147483648
 # timestamp,current_market.clearing_price,current_market.clearing_quantity,current_market.seller_total_quantity,current_market.buyer_total_quantity,current_market.clearing_type
-2018-01-09 12:09:28 UTC,+0.14,+0,+0,+0,NULL
-2018-01-09 12:10:28 UTC,+0.3,+3.43535,+2400,+3.43535,MARGINAL_SELLER
+2018-01-18 12:55:42 UTC,+0.14,+0,+0,+0,NULL
+2018-01-18 12:56:42 UTC,+0.14,+0,+0,+0,NULL
