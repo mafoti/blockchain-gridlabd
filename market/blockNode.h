@@ -28,6 +28,9 @@ public:
 	void submitGenerationBid(int id, int price, int quantity);
 	blockNode();
 	virtual ~blockNode();
+
+private:
+	void sendBalance(std::string accounts);
 };
 
 #endif /* BLOCKNODE_H_ */

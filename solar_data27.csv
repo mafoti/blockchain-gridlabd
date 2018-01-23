@@ -1,0 +1,10 @@
+# file...... solar_data27.csv
+# date...... Mon Jan 22 15:51:40 2018
+# user...... ubuntu
+# host...... (null)
+# target.... solar 3581
+# trigger... (none)
+# interval.. 900
+# limit..... 1000000
+# timestamp,VA_Out,price
+2000-01-01 00:00:00 UTC,+0+0j,+0.12

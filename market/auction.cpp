@@ -239,7 +239,6 @@ int auction::create(void)
 		gl_set_value(OBJECTHDR(this), stat->prop, val);
 	}
 	statistic_mode = ST_ON;
-	printf("auction create method, call to blockchain.init? %d\n",is_block_node);
 
 	OBJECT *obj=OBJECTHDR(this);
 	this->blockchain.initNode(obj->id);

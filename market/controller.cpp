@@ -1013,6 +1013,7 @@ TIMESTAMP controller::presync(TIMESTAMP t0, TIMESTAMP t1){
 }
 
 TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
+
 	double bid = -1.0;
 	int64 no_bid = 0; // flag gets set when the current temperature drops in between the the heating setpoint and cooling setpoint curves
 	double rampify = 0.0;
