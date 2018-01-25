@@ -241,7 +241,7 @@ int auction::create(void)
 	statistic_mode = ST_ON;
 
 	OBJECT *obj=OBJECTHDR(this);
-	//this->blockchain.initNode(obj->id);
+	this->blockchain.initNode(obj->id);
 
 	return 1; /* return 1 on success, 0 on failure */
 }
@@ -255,7 +255,7 @@ int auction::init(OBJECT *parent)
 		is_block_node=false;
 	}
 	if(is_block_node){
-		//this->blockchain.startNode(obj->id);
+		this->blockchain.startNode(obj->id);
 	}
 	unsigned int i = 0;
 	if(capacity_reference_object != NULL){
@@ -875,7 +875,7 @@ void auction::clear_market(void)
 {
 	OBJECT *obj=OBJECTHDR(this);
 	if(is_block_node){
-		 //this->blockchain.clearMarket(obj->id);
+		 this->blockchain.clearMarket(obj->id);
 	}
 	unsigned int sph24 = (unsigned int)(3600/period*24);
 	BID unresponsive;

@@ -35,7 +35,7 @@ int stub_bidder::create()
 	controller_bid.bid_accepted = true;
 	bid_id = -1;
 	OBJECT *obj=OBJECTHDR(this);
-	//this->blockchain.initNode(obj->id);
+	this->blockchain.initNode(obj->id);
 	return SUCCESS;
 }
 
@@ -68,7 +68,7 @@ int stub_bidder::init(OBJECT *parent)
 	}
 	if(is_block_node){
 		OBJECT *obj=OBJECTHDR(this);
-		//this->blockchain.startNode(obj->id);
+		this->blockchain.startNode(obj->id);
 	}
 	return SUCCESS;
 }
@@ -104,7 +104,7 @@ TIMESTAMP stub_bidder::sync(TIMESTAMP t0, TIMESTAMP t1)
 			//submit transaction bid
 			int price = (int)(controller_bid.price * 100);
 			int quantity = (int)(controller_bid.quantity * 100);
-			//this->blockchain.submitGenerationBid(hdr->id, price, fabs(quantity));
+			this->blockchain.submitGenerationBid(hdr->id, price, fabs(quantity));
 		}
 		if(controller_bid.bid_accepted == false){
 			return TS_INVALID;

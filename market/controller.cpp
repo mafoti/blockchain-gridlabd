@@ -205,7 +205,7 @@ int controller::create(){
 	controller_bid2.bid_accepted = true;
 	bid_id = -1;
 	OBJECT *hdr = OBJECTHDR(this);
-	//this->blockchain.initNode(hdr->id);
+	this->blockchain.initNode(hdr->id);
 
 
 	return 1;
@@ -332,7 +332,7 @@ int controller::init(OBJECT *parent){
 		is_block_node=false;
 	}
 	if(is_block_node){
-		//this->blockchain.startNode(hdr->id);
+		this->blockchain.startNode(hdr->id);
 	}
 	char tname[32];
 	char *namestr = (hdr->name ? hdr->name : tname);
@@ -1895,7 +1895,7 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 					//submit transaction bid
 					int price = (int)(controller_bid.price * 100);
 					int quantity = (int)(controller_bid.quantity * 100);
-					//this->blockchain.submitConsumptionBid(hdr->id, price, fabs(quantity));
+					this->blockchain.submitConsumptionBid(hdr->id, price, fabs(quantity));
 				}
 			} else {
 				controller_bid.state = BS_UNKNOWN;
@@ -1905,7 +1905,7 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 					//submit transaction bid
 					int price = (int)(controller_bid.price * 100);
 					int quantity = (int)(controller_bid.quantity * 100);
-					//this->blockchain.submitConsumptionBid(hdr->id, price, fabs(quantity));
+					this->blockchain.submitConsumptionBid(hdr->id, price, fabs(quantity));
 				}
 			}
 			if(controller_bid.bid_accepted == false){
@@ -1932,7 +1932,7 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 					//submit transaction bid
 					int price = (int)(controller_bid.price * 100);
 					int quantity = (int)(controller_bid.quantity * 100);
-					//this->blockchain.submitConsumptionBid(hdr->id, price, fabs(quantity));
+					this->blockchain.submitConsumptionBid(hdr->id, price, fabs(quantity));
 				}
 				if(controller_bid.bid_accepted == false){
 					return TS_INVALID;
