@@ -1,6 +1,8 @@
 
+#define stylesheet=http://gridlab-d.svn.sourceforge.net/viewvc/gridlab-d/trunk/core/gridlabd-2_0
 clock {
-	timestamp '2014-01-01 0:00:00';
+	starttime '2001-07-22 01:00:00';
+	stoptime '2018-07-29 01:00:36';
 	timezone EST+5EDT;
 }
 
@@ -69,7 +71,7 @@ object underground_line_conductor {
 
 // ID-500abcn
 object line_spacing {
-	name line_spacing1;
+	name linespacing1;
 	distance_AB 2.5;
 	distance_AC 4.5;
 	distance_BC 7.0;
@@ -79,7 +81,7 @@ object line_spacing {
 }
 // ID-500 acbn
 object line_spacing {
-	name line_spacing2;
+	name linespacing2;
 	distance_AC 2.5;
 	distance_AB 4.5;
 	distance_BC 7.0;
@@ -89,7 +91,7 @@ object line_spacing {
 }
 // ID-505 bcn
 object line_spacing {
-	name line_spacing3;
+	name linespacing3;
 	distance_AC 0.0;
 	distance_AB 0.0;
 	distance_BC 7.0;
@@ -99,7 +101,7 @@ object line_spacing {
 }
 // ID-505 acn
 object line_spacing {
-	name line_spacing4;
+	name linespacing4;
 	distance_AC 7.0;
 	distance_AB 0.0;
 	distance_BC 0.0;
@@ -109,7 +111,7 @@ object line_spacing {
 }
 // ID-510 cn
 object line_spacing {
-	name line_spacing5;
+	name linespacing5;
 	distance_AC 0.0;
 	distance_AB 0.0;
 	distance_BC 0.0;
@@ -120,7 +122,7 @@ object line_spacing {
 // ID-515 abc
 //Underground line spacing
 object line_spacing {
-	 name line_spacing6;
+	 name linespacing6;
 	 distance_AB 0.500000;
 	 distance_BC 0.500000;
 	 distance_AC 1.000000;
@@ -130,7 +132,7 @@ object line_spacing {
 }
 // ID-520 an
 object line_spacing {
-	name line_spacing_7;
+	name linespacing7;
 	 distance_AB 0.000000;
 	 distance_BC 0.000000;
 	 distance_AC 0.000000;
@@ -147,7 +149,7 @@ object line_configuration {
 	conductor_B conductor1;
 	conductor_C conductor1;
 	conductor_N conductor2;
-	spacing line_spacing1;
+	spacing linespacing1;
 }
 // Configuration 602
 object line_configuration {
@@ -156,7 +158,7 @@ object line_configuration {
 	conductor_B conductor2;
 	conductor_C conductor2;
 	conductor_N conductor2;
-	spacing line_spacing2;
+	spacing linespacing2;
 }
 // Configuration 603
 object line_configuration {
@@ -164,7 +166,7 @@ object line_configuration {
 	conductor_B conductor3;
 	conductor_C conductor3;
 	conductor_N conductor3;
-	spacing line_spacing3;
+	spacing linespacing7;
 }
 // Configuration 604
 object line_configuration {
@@ -172,14 +174,14 @@ object line_configuration {
 	conductor_A conductor3;
 	conductor_C conductor3;
 	conductor_N conductor3;
-	spacing line_spacing4;
+	spacing linespacing4;
 }
 // Configuration 605
 object line_configuration {
     name line_configuration5;
 	conductor_C conductor3;
 	conductor_N conductor3;
-	spacing line_spacing5;
+	spacing linespacing5;
 }
 
 
@@ -189,14 +191,14 @@ object line_configuration {
 	 conductor_A conductor4;
 	 conductor_B conductor4;
 	 conductor_C conductor4;
-	 spacing line_spacing6;
+	 spacing linespacing6;
 }
 // Configuration 607
 object line_configuration {
      name line_configuration7;
 	 conductor_A conductor5;
 	 conductor_N conductor5;
-	 spacing line_spacing6;
+	 spacing linespacing7;
 }
 
 // Transformer configuration
@@ -558,3 +560,4 @@ object currdump {
           limit 1;
           property tap_A,tap_B,tap_C,power_in_A.real,power_in_A.imag,power_in_B.real,power_in_B.imag,power_in_C.real,power_in_C.imag,power_in.real,power_in.imag;
      };
+

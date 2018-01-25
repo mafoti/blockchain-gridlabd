@@ -4,26 +4,57 @@
 #set threadcount=1;
 #set randomseed=1;
 #set relax_naming_rules=1;
+#set iteration_limit=100000;
 #define stylesheet=http://gridlab-d.svn.sourceforge.net/viewvc/gridlab-d/trunk/core/gridlabd-2_0
 
 clock {
 	timestamp '2000-01-01 0:00:00';
-	stoptime '2000-01-01 1:00:00';
-	timezone EST+8EDT;
+	stoptime '2000-01-10 1:00:00';
 }
 
 module tape;
-//module generators;
-module powerflow{
+module market;
+module powerflow {
 	solver_method FBS;
-	default_maximum_voltage_error 1e-9;
-	line_limits FALSE;
 };
+module generators;
 module climate;
 module residential {
 	implicit_enduses NONE;
 	ANSI_voltage_check FALSE;
 };
+
+class auction {
+    double current_price_mean_24h;
+    double current_price_stdev_24h;
+}
+object auction {
+    is_block_node true;
+    name Market_pool;
+    special_mode NONE;
+    unit kW;
+    period 60;
+    init_price 0.14;
+    init_stdev 5;
+    warmup 0;
+    object multi_recorder {
+ 	property current_market.clearing_price,current_market.clearing_quantity,current_market.seller_total_quantity,current_market.buyer_total_quantity,current_market.clearing_type;
+  	file "market_1.csv";
+ 	interval 60;
+        limit 1111111111168;
+ 	};
+}
+
+object stub_bidder {
+	is_block_node true;
+	name buyer_1;
+	role SELLER;
+	bid_period 60;
+	market Market_pool;
+	price 0.3;
+	quantity 2400;
+	count 10000;
+}
 
 schedule waterdemand1 {
 	* 0-5 * * * 0;
@@ -180,7 +211,7 @@ schedule ZIP1base_power {
 }
 
 object triplex_line_conductor {
-	name tp_line_conductor;
+	name tx_conductor;
 	resistance 0.97;
 	geometric_mean_radius 0.0111;
 };
@@ -188,9 +219,9 @@ object triplex_line_conductor {
 // Triplex Line
 object triplex_line_configuration {
 	name triplex_line_configuration_1;
-	conductor_1 tp_line_conductor;
-	conductor_2 tp_line_conductor;
-	conductor_N tp_line_conductor;
+	conductor_1 tx_conductor;
+	conductor_2 tx_conductor;
+	conductor_N tx_conductor;
 	insulation_thickness 0.08;
 	diameter 0.368;
 }
@@ -1087,7 +1118,7 @@ object transformer_configuration {
 	name AS_config;
 	connect_type SINGLE_PHASE_CENTER_TAPPED;
 	install_type POLETOP;
-	powerA_rating 75;
+	powerA_rating 175;
 	primary_voltage 2401;
 	secondary_voltage 120.000;
 	impedance 0.006+0.0136j;
@@ -1097,7 +1128,7 @@ object transformer_configuration {
 	name BS_config;
 	connect_type SINGLE_PHASE_CENTER_TAPPED;
 	install_type POLETOP;
-	powerB_rating 75;
+	powerB_rating 175;
 	primary_voltage 2401;
 	secondary_voltage 120.000;
 	impedance 0.006+0.0136j;
@@ -1107,7 +1138,7 @@ object transformer_configuration {
 	name CS_config;
 	connect_type SINGLE_PHASE_CENTER_TAPPED;
 	install_type POLETOP;
-	powerC_rating 75;
+	powerC_rating 175;
 	primary_voltage 2401;
 	secondary_voltage 120.000;
 	impedance 0.006+0.0136j;
@@ -1181,319 +1212,586 @@ object regulator:650630 {
 
 // House 1
 object house:..20 {
-	parent trip_meter1;
-	floor_area random.normal(1750,400);
-	heating_setpoint heatingsetpoint4+random.normal(0,4);
-	cooling_setpoint random.normal (80,2);
-	thermostat_deadband random.normal (2,.5);
-	object ZIPload {
-		base_power ZIP1base_power*random.normal(1,.25);
-		power_fraction 0.2;
-		impedance_fraction 0.3;
-		current_fraction 0.5;
-		power_pf 0.9;
-		current_pf 0.6;
-		impedance_pf 0.8;
-	};
-	object waterheater {
-		location INSIDE;
-		water_demand waterdemand1*random.normal(1,.2);
-	};
+     parent trip_meter1;
+     floor_area random.normal(1750,400);
+     schedule_skew random.normal(3600,-3600);
+     heating_system_type HEAT_PUMP;
+     cooling_system_type ELECTRIC;
+
+     object controller {
+	   is_block_node true;
+           schedule_skew random.normal(3600,-3600);
+           market Market_pool;
+           bid_mode ON;
+           control_mode DOUBLE_RAMP;
+           resolve_mode DEADBAND;
+           slider_setting_heat 0.500;
+           slider_setting_cool 0.500;
+           heating_base_setpoint 66;
+           cooling_base_setpoint 72;
+           period 60;
+           average_target current_price_mean_24h;
+           standard_deviation_target current_price_stdev_24h;
+           target air_temperature;
+           heating_setpoint heating_setpoint;
+           heating_demand last_heating_load;
+           cooling_setpoint cooling_setpoint;
+           cooling_demand last_cooling_load;
+           deadband thermostat_deadband;
+           total hvac_load;
+           load hvac_load;
+           state power_state;
+       };
+
+     thermal_integrity_level 3;
+     air_temperature 70;
+     mass_temperature 70;
+     cooling_COP 2.5;
 }
 
 // House 2
 object house:..20 {
 	parent trip_meter2;
-	floor_area random.normal(1750,400);
-	heating_setpoint heatingsetpoint2+random.normal(0,4);
-	cooling_setpoint random.normal (80,2);
-	object ZIPload {
-		base_power ZIP1base_power*random.normal(1,.25);
-		power_fraction 0.2;
-		impedance_fraction 0.3;
-		current_fraction 0.5;
-		power_pf 0.9;
-		current_pf 0.6;
-		impedance_pf 0.8;
+	schedule_skew random.normal(3600,-3600);
+	heating_system_type HEAT_PUMP;
+	cooling_system_type ELECTRIC;
+
+	object controller {
+	   is_block_node true;
+	   schedule_skew random.normal(3600,-3600);
+	   market Market_pool;
+	   bid_mode ON;
+	   control_mode DOUBLE_RAMP;
+	   resolve_mode DEADBAND;
+	   slider_setting_heat 0.500;
+	   slider_setting_cool 0.500;
+	   heating_base_setpoint 66;
+	   cooling_base_setpoint 72;
+	   period 60;
+	   average_target current_price_mean_24h;
+	   standard_deviation_target current_price_stdev_24h;
+	   target air_temperature;
+	   heating_setpoint heating_setpoint;
+	   heating_demand last_heating_load;
+	   cooling_setpoint cooling_setpoint;
+	   cooling_demand last_cooling_load;
+	   deadband thermostat_deadband;
+	   total hvac_load;
+	   load hvac_load;
+	   state power_state;
 	};
-	object waterheater {
-		location INSIDE;
-		water_demand waterdemand3*random.normal(1,.2);
-	};
+
+	thermal_integrity_level 3;
+	air_temperature 70;
+	mass_temperature 70;
+	cooling_COP 2.5;
 }
 
 // House 3
 object house:..20 {
 	parent trip_meter3;
-	floor_area random.normal(1750,400);
-	heating_setpoint heatingsetpoint2+random.normal(0,4);
-	cooling_setpoint random.normal (80,2);
-	object ZIPload {
-		base_power ZIP1base_power*random.normal(1,.25);
-		power_fraction 0.2;
-		impedance_fraction 0.3;
-		current_fraction 0.5;
-		power_pf 0.9;
-		current_pf 0.6;
-		impedance_pf 0.8;
+	schedule_skew random.normal(3600,-3600);
+	heating_system_type HEAT_PUMP;
+	cooling_system_type ELECTRIC;
+
+	object controller {
+	   is_block_node true;
+	   schedule_skew random.normal(3600,-3600);
+	   market Market_pool;
+	   bid_mode ON;
+	   control_mode DOUBLE_RAMP;
+	   resolve_mode DEADBAND;
+	   slider_setting_heat 0.500;
+	   slider_setting_cool 0.500;
+	   heating_base_setpoint 66;
+	   cooling_base_setpoint 72;
+	   period 60;
+	   average_target current_price_mean_24h;
+	   standard_deviation_target current_price_stdev_24h;
+	   target air_temperature;
+	   heating_setpoint heating_setpoint;
+	   heating_demand last_heating_load;
+	   cooling_setpoint cooling_setpoint;
+	   cooling_demand last_cooling_load;
+	   deadband thermostat_deadband;
+	   total hvac_load;
+	   load hvac_load;
+	   state power_state;
 	};
-	object waterheater {
-		location INSIDE;
-		water_demand waterdemand2*random.normal(1,.2);
-	};
+
+	thermal_integrity_level 3;
+	air_temperature 70;
+	mass_temperature 70;
+	cooling_COP 2.5;
 }
 
 // House 4
 object house:..20 {
 	parent trip_meter4;
-	floor_area random.normal(1750,400);
-	heating_setpoint heatingsetpoint5+random.normal(0,4);
-	cooling_setpoint random.normal (80,2);
-	object ZIPload {
-		base_power ZIP1base_power*random.normal(1,.25);
-		power_fraction 0.2;
-		impedance_fraction 0.3;
-		current_fraction 0.5;
-		power_pf 0.9;
-		current_pf 0.6;
-		impedance_pf 0.8;
+	schedule_skew random.normal(3600,-3600);
+	heating_system_type HEAT_PUMP;
+	cooling_system_type ELECTRIC;
+
+	object controller {
+	   is_block_node true;
+	   schedule_skew random.normal(3600,-3600);
+	   market Market_pool;
+	   bid_mode ON;
+	   control_mode DOUBLE_RAMP;
+	   resolve_mode DEADBAND;
+	   slider_setting_heat 0.500;
+	   slider_setting_cool 0.500;
+	   heating_base_setpoint 66;
+	   cooling_base_setpoint 72;
+	   period 60;
+	   average_target current_price_mean_24h;
+	   standard_deviation_target current_price_stdev_24h;
+	   target air_temperature;
+	   heating_setpoint heating_setpoint;
+	   heating_demand last_heating_load;
+	   cooling_setpoint cooling_setpoint;
+	   cooling_demand last_cooling_load;
+	   deadband thermostat_deadband;
+	   total hvac_load;
+	   load hvac_load;
+	   state power_state;
 	};
-	object waterheater {
-		location INSIDE;
-		water_demand waterdemand3*random.normal(1,.2);
-	};
+
+	thermal_integrity_level 3;
+	air_temperature 70;
+	mass_temperature 70;
+	cooling_COP 2.5;
 }
 
 // House 5
 object house:..20 {
 	parent trip_meter5;
-	floor_area random.normal(1750,400);
-	heating_setpoint heatingsetpoint2+random.normal(0,4);
-	cooling_setpoint random.normal (80,2);
-	object ZIPload {
-		base_power ZIP1base_power*random.normal(1,.25);
-		power_fraction 0.2;
-		impedance_fraction 0.3;
-		current_fraction 0.5;
-		power_pf 0.9;
-		current_pf 0.6;
-		impedance_pf 0.8;
+	schedule_skew random.normal(3600,-3600);
+	heating_system_type HEAT_PUMP;
+	cooling_system_type ELECTRIC;
+
+	object controller {
+	   is_block_node true;
+	   schedule_skew random.normal(3600,-3600);
+	   market Market_pool;
+	   bid_mode ON;
+	   control_mode DOUBLE_RAMP;
+	   resolve_mode DEADBAND;
+	   slider_setting_heat 0.500;
+	   slider_setting_cool 0.500;
+	   heating_base_setpoint 66;
+	   cooling_base_setpoint 72;
+	   period 60;
+	   average_target current_price_mean_24h;
+	   standard_deviation_target current_price_stdev_24h;
+	   target air_temperature;
+	   heating_setpoint heating_setpoint;
+	   heating_demand last_heating_load;
+	   cooling_setpoint cooling_setpoint;
+	   cooling_demand last_cooling_load;
+	   deadband thermostat_deadband;
+	   total hvac_load;
+	   load hvac_load;
+	   state power_state;
 	};
-	object waterheater {
-		location INSIDE;
-		water_demand waterdemand3*random.normal(1,.2);
-	};
+
+	thermal_integrity_level 3;
+	air_temperature 70;
+	mass_temperature 70;
+	cooling_COP 2.5;
 }
 
 // House 6
 object house:..20 {
 	parent trip_meter6;
-	floor_area random.normal(1750,400);
-	heating_setpoint heatingsetpoint3+random.normal(0,4);
-	cooling_setpoint random.normal (80,2);
-	object ZIPload {
-		base_power ZIP1base_power*random.normal(1,.25);
-		power_fraction 0.2;
-		impedance_fraction 0.3;
-		current_fraction 0.5;
-		power_pf 0.9;
-		current_pf 0.6;
-		impedance_pf 0.8;
+	schedule_skew random.normal(3600,-3600);
+	heating_system_type HEAT_PUMP;
+	cooling_system_type ELECTRIC;
+
+	object controller {
+	   is_block_node true;
+	   schedule_skew random.normal(3600,-3600);
+	   market Market_pool;
+	   bid_mode ON;
+	   control_mode DOUBLE_RAMP;
+	   resolve_mode DEADBAND;
+	   slider_setting_heat 0.500;
+	   slider_setting_cool 0.500;
+	   heating_base_setpoint 66;
+	   cooling_base_setpoint 72;
+	   period 60;
+	   average_target current_price_mean_24h;
+	   standard_deviation_target current_price_stdev_24h;
+	   target air_temperature;
+	   heating_setpoint heating_setpoint;
+	   heating_demand last_heating_load;
+	   cooling_setpoint cooling_setpoint;
+	   cooling_demand last_cooling_load;
+	   deadband thermostat_deadband;
+	   total hvac_load;
+	   load hvac_load;
+	   state power_state;
 	};
-	object waterheater {
-		location INSIDE;
-		water_demand waterdemand1*random.normal(1,.2);
-	};
+
+	thermal_integrity_level 3;
+	air_temperature 70;
+	mass_temperature 70;
+	cooling_COP 2.5;
 }
 
 // House 7
 object house:..20 {
 	parent trip_meter7;
-	floor_area random.normal(1750,400);
-	heating_setpoint heatingsetpoint5+random.normal(0,4);
-	cooling_setpoint random.normal (80,2);
-	object ZIPload {
-		base_power ZIP1base_power*random.normal(1,.25);
-		power_fraction 0.2;
-		impedance_fraction 0.3;
-		current_fraction 0.5;
-		power_pf 0.9;
-		current_pf 0.6;
-		impedance_pf 0.8;
+	schedule_skew random.normal(3600,-3600);
+	heating_system_type HEAT_PUMP;
+	cooling_system_type ELECTRIC;
+
+	object controller {
+	   is_block_node true;
+	   schedule_skew random.normal(3600,-3600);
+	   market Market_pool;
+	   bid_mode ON;
+	   control_mode DOUBLE_RAMP;
+	   resolve_mode DEADBAND;
+	   slider_setting_heat 0.500;
+	   slider_setting_cool 0.500;
+	   heating_base_setpoint 66;
+	   cooling_base_setpoint 72;
+	   period 60;
+	   average_target current_price_mean_24h;
+	   standard_deviation_target current_price_stdev_24h;
+	   target air_temperature;
+	   heating_setpoint heating_setpoint;
+	   heating_demand last_heating_load;
+	   cooling_setpoint cooling_setpoint;
+	   cooling_demand last_cooling_load;
+	   deadband thermostat_deadband;
+	   total hvac_load;
+	   load hvac_load;
+	   state power_state;
 	};
-	object waterheater {
-		location INSIDE;
-		water_demand waterdemand2*random.normal(1,.2);
-	};
+
+	thermal_integrity_level 3;
+	air_temperature 70;
+	mass_temperature 70;
+	cooling_COP 2.5;
 }
 
 // House 8
 object house:..20 {
 	parent trip_meter8;
-	floor_area random.normal(1750,400);
-	heating_setpoint heatingsetpoint2+random.normal(0,4);
-	cooling_setpoint random.normal (80,2);
-	object ZIPload {
-		base_power ZIP1base_power*random.normal(1,.25);
-		power_fraction 0.2;
-		impedance_fraction 0.3;
-		current_fraction 0.5;
-		power_pf 0.9;
-		current_pf 0.6;
-		impedance_pf 0.8;
+	schedule_skew random.normal(3600,-3600);
+	heating_system_type HEAT_PUMP;
+	cooling_system_type ELECTRIC;
+
+	object controller {
+	   is_block_node true;
+	   schedule_skew random.normal(3600,-3600);
+	   market Market_pool;
+	   bid_mode ON;
+	   control_mode DOUBLE_RAMP;
+	   resolve_mode DEADBAND;
+	   slider_setting_heat 0.500;
+	   slider_setting_cool 0.500;
+	   heating_base_setpoint 66;
+	   cooling_base_setpoint 72;
+	   period 60;
+	   average_target current_price_mean_24h;
+	   standard_deviation_target current_price_stdev_24h;
+	   target air_temperature;
+	   heating_setpoint heating_setpoint;
+	   heating_demand last_heating_load;
+	   cooling_setpoint cooling_setpoint;
+	   cooling_demand last_cooling_load;
+	   deadband thermostat_deadband;
+	   total hvac_load;
+	   load hvac_load;
+	   state power_state;
 	};
-	object waterheater {
-		location INSIDE;
-		water_demand waterdemand2*random.normal(1,.2);
-	};
+
+	thermal_integrity_level 3;
+	air_temperature 70;
+	mass_temperature 70;
+	cooling_COP 2.5;
 }
 
 // House 9
 object house:..20 {
 	parent trip_meter9;
-	floor_area random.normal(1750,400);
-	heating_setpoint heatingsetpoint5+random.normal(0,4);
-	cooling_setpoint random.normal (80,2);
-	object ZIPload {
-		base_power ZIP1base_power*random.normal(1,.25);
-		power_fraction 0.2;
-		impedance_fraction 0.3;
-		current_fraction 0.5;
-		power_pf 0.9;
-		current_pf 0.6;
-		impedance_pf 0.8;
+	schedule_skew random.normal(3600,-3600);
+	heating_system_type HEAT_PUMP;
+	cooling_system_type ELECTRIC;
+
+	object controller {
+	   is_block_node true;
+	   schedule_skew random.normal(3600,-3600);
+	   market Market_pool;
+	   bid_mode ON;
+	   control_mode DOUBLE_RAMP;
+	   resolve_mode DEADBAND;
+	   slider_setting_heat 0.500;
+	   slider_setting_cool 0.500;
+	   heating_base_setpoint 66;
+	   cooling_base_setpoint 72;
+	   period 60;
+	   average_target current_price_mean_24h;
+	   standard_deviation_target current_price_stdev_24h;
+	   target air_temperature;
+	   heating_setpoint heating_setpoint;
+	   heating_demand last_heating_load;
+	   cooling_setpoint cooling_setpoint;
+	   cooling_demand last_cooling_load;
+	   deadband thermostat_deadband;
+	   total hvac_load;
+	   load hvac_load;
+	   state power_state;
 	};
-	object waterheater {
-		location INSIDE;
-		water_demand waterdemand3*random.normal(1,.2);
-	};
+
+	thermal_integrity_level 3;
+	air_temperature 70;
+	mass_temperature 70;
+	cooling_COP 2.5;
 }
 
 // House 10
 object house:..20 {
 	parent trip_meter10;
-	floor_area random.normal(1750,400);
-	heating_setpoint heatingsetpoint4+random.normal(0,4);
-	cooling_setpoint random.normal (80,2);
-	object ZIPload {
-		base_power ZIP1base_power*random.normal(1,.25);
-		power_fraction 0.2;
-		impedance_fraction 0.3;
-		current_fraction 0.5;
-		power_pf 0.9;
-		current_pf 0.6;
-		impedance_pf 0.8;
+	schedule_skew random.normal(3600,-3600);
+	heating_system_type HEAT_PUMP;
+	cooling_system_type ELECTRIC;
+
+	object controller {
+	   is_block_node true;
+	   schedule_skew random.normal(3600,-3600);
+	   market Market_pool;
+	   bid_mode ON;
+	   control_mode DOUBLE_RAMP;
+	   resolve_mode DEADBAND;
+	   slider_setting_heat 0.500;
+	   slider_setting_cool 0.500;
+	   heating_base_setpoint 66;
+	   cooling_base_setpoint 72;
+	   period 60;
+	   average_target current_price_mean_24h;
+	   standard_deviation_target current_price_stdev_24h;
+	   target air_temperature;
+	   heating_setpoint heating_setpoint;
+	   heating_demand last_heating_load;
+	   cooling_setpoint cooling_setpoint;
+	   cooling_demand last_cooling_load;
+	   deadband thermostat_deadband;
+	   total hvac_load;
+	   load hvac_load;
+	   state power_state;
 	};
-	object waterheater {
-		location INSIDE;
-		water_demand waterdemand3*random.normal(1,.2);
-	};
+
+	thermal_integrity_level 3;
+	air_temperature 70;
+	mass_temperature 70;
+	cooling_COP 2.5;
 }
 
 // House 11
 object house:..20 {
 	parent trip_meter11;
-	floor_area random.normal(1750,400);
-	heating_setpoint heatingsetpoint2+random.normal(0,4);
-	cooling_setpoint random.normal (80,2);
-	object ZIPload {
-		base_power ZIP1base_power*random.normal(1,.25);
-		power_fraction 0.2;
-		impedance_fraction 0.3;
-		current_fraction 0.5;
-		power_pf 0.9;
-		current_pf 0.6;
-		impedance_pf 0.8;
+	schedule_skew random.normal(3600,-3600);
+	heating_system_type HEAT_PUMP;
+	cooling_system_type ELECTRIC;
+
+	object controller {
+	   is_block_node true;
+	   schedule_skew random.normal(3600,-3600);
+	   market Market_pool;
+	   bid_mode ON;
+	   control_mode DOUBLE_RAMP;
+	   resolve_mode DEADBAND;
+	   slider_setting_heat 0.500;
+	   slider_setting_cool 0.500;
+	   heating_base_setpoint 66;
+	   cooling_base_setpoint 72;
+	   period 60;
+	   average_target current_price_mean_24h;
+	   standard_deviation_target current_price_stdev_24h;
+	   target air_temperature;
+	   heating_setpoint heating_setpoint;
+	   heating_demand last_heating_load;
+	   cooling_setpoint cooling_setpoint;
+	   cooling_demand last_cooling_load;
+	   deadband thermostat_deadband;
+	   total hvac_load;
+	   load hvac_load;
+	   state power_state;
 	};
-	object waterheater {
-		location INSIDE;
-		water_demand waterdemand2*random.normal(1,.2);
-	};
+
+	thermal_integrity_level 3;
+	air_temperature 70;
+	mass_temperature 70;
+	cooling_COP 2.5;
 }
 
 // House 12
 object house:..20 {
 	parent trip_meter12;
-	floor_area random.normal(1750,400);
-	heating_setpoint heatingsetpoint1+random.normal(0,4);
-	cooling_setpoint random.normal (80,2);
-	object ZIPload {
-		base_power ZIP1base_power*random.normal(1,.25);
-		power_fraction 0.2;
-		impedance_fraction 0.3;
-		current_fraction 0.5;
-		power_pf 0.9;
-		current_pf 0.6;
-		impedance_pf 0.8;
+	schedule_skew random.normal(3600,-3600);
+	heating_system_type HEAT_PUMP;
+	cooling_system_type ELECTRIC;
+
+	object controller {
+	   is_block_node true;
+	   schedule_skew random.normal(3600,-3600);
+	   market Market_pool;
+	   bid_mode ON;
+	   control_mode DOUBLE_RAMP;
+	   resolve_mode DEADBAND;
+	   slider_setting_heat 0.500;
+	   slider_setting_cool 0.500;
+	   heating_base_setpoint 66;
+	   cooling_base_setpoint 72;
+	   period 60;
+	   average_target current_price_mean_24h;
+	   standard_deviation_target current_price_stdev_24h;
+	   target air_temperature;
+	   heating_setpoint heating_setpoint;
+	   heating_demand last_heating_load;
+	   cooling_setpoint cooling_setpoint;
+	   cooling_demand last_cooling_load;
+	   deadband thermostat_deadband;
+	   total hvac_load;
+	   load hvac_load;
+	   state power_state;
 	};
-	object waterheater {
-		location INSIDE;
-		water_demand waterdemand3*random.normal(1,.2);
-	};
+
+	thermal_integrity_level 3;
+	air_temperature 70;
+	mass_temperature 70;
+	cooling_COP 2.5;
 }
 
 // House 13
 object house:..20 {
 	parent trip_meter13;
-	floor_area random.normal(1750,400);
-	heating_setpoint heatingsetpoint3+random.normal(0,4);
-	cooling_setpoint random.normal (80,2);
-	object ZIPload {
-		base_power ZIP1base_power*random.normal(1,.25);
-		power_fraction 0.2;
-		impedance_fraction 0.3;
-		current_fraction 0.5;
-		power_pf 0.9;
-		current_pf 0.6;
-		impedance_pf 0.8;
+	schedule_skew random.normal(3600,-3600);
+	heating_system_type HEAT_PUMP;
+	cooling_system_type ELECTRIC;
+
+	object controller {
+	   is_block_node true;
+	   schedule_skew random.normal(3600,-3600);
+	   market Market_pool;
+	   bid_mode ON;
+	   control_mode DOUBLE_RAMP;
+	   resolve_mode DEADBAND;
+	   slider_setting_heat 0.500;
+	   slider_setting_cool 0.500;
+	   heating_base_setpoint 66;
+	   cooling_base_setpoint 72;
+	   period 60;
+	   average_target current_price_mean_24h;
+	   standard_deviation_target current_price_stdev_24h;
+	   target air_temperature;
+	   heating_setpoint heating_setpoint;
+	   heating_demand last_heating_load;
+	   cooling_setpoint cooling_setpoint;
+	   cooling_demand last_cooling_load;
+	   deadband thermostat_deadband;
+	   total hvac_load;
+	   load hvac_load;
+	   state power_state;
 	};
-	object waterheater {
-		location INSIDE;
-		water_demand waterdemand2*random.normal(1,.2);
-	};
+
+	thermal_integrity_level 3;
+	air_temperature 70;
+	mass_temperature 70;
+	cooling_COP 2.5;
 }
 
-// House 14
-object house:..20 {
+
+// Inverters 1
+object inverter:..20 {
+	phases BS;
 	parent trip_meter14;
-	floor_area random.normal(1750,400);
-	heating_setpoint heatingsetpoint4+random.normal(0,4);
-	cooling_setpoint random.normal (80,2);
-	object ZIPload {
-		base_power ZIP1base_power*random.normal(1,.25);
-		power_fraction 0.2;
-		impedance_fraction 0.3;
-		current_fraction 0.5;
-		power_pf 0.9;
-		current_pf 0.6;
-		impedance_pf 0.8;
-	};
-	object waterheater {
-		location INSIDE;
-		water_demand waterdemand1*random.normal(1,.2);
+	inverter_efficiency .95;
+	rated_power 6000;	
+        generator_mode CONSTANT_PF;
+        generator_status ONLINE;
+        inverter_type PWM; 
+        //flags DELTAMODE;
+        dynamic_model_mode PID;
+        inverter_convergence_criterion 0.001;
+        power_factor 1.0;
+        object solar {
+	        price 0.12;
+	        phases CS;
+	        generator_status ONLINE;
+	        generator_mode SUPPLY_DRIVEN;
+	        panel_type SINGLE_CRYSTAL_SILICON;
+	        area 250 ft^2;
+	        tilt_angle 47.0;
+	        efficiency 0.135;
+		object generator_controller 
+		{ 
+		   	is_block_node true;
+			market Market_pool;
+			generator_rating 80;
+			generator_state OFF;
+			bid_curve  "80 25.00";
+			startup_cost 25.00;
+			shutdown_cost 15.00;
+			minimum_runtime 15 min;
+			minimum_downtime 0 min;
+			amortization_factor 7 1/h;
+		};
+
 	};
 }
 
-// House 15
-object house:..20 {
+// Inverters 2
+object inverter:..20 {
+	phases CS;
 	parent trip_meter15;
-	floor_area random.normal(1750,400);
-	heating_setpoint heatingsetpoint2+random.normal(0,4);
-	cooling_setpoint random.normal (80,2);
-	object ZIPload {
-		base_power ZIP1base_power*random.normal(1,.25);
-		power_fraction 0.2;
-		impedance_fraction 0.3;
-		current_fraction 0.5;
-		power_pf 0.9;
-		current_pf 0.6;
-		impedance_pf 0.8;
-	};
-	object waterheater {
-		location INSIDE;
-		water_demand waterdemand3*random.normal(1,.2);
+	inverter_efficiency .95;
+	rated_power 6000;	
+        generator_mode CONSTANT_PF;
+        generator_status ONLINE;
+        inverter_type PWM; 
+        //flags DELTAMODE;
+        dynamic_model_mode PID;
+        inverter_convergence_criterion 0.001;
+        power_factor 1.0;
+        object solar {
+	        price 0.12;
+	        phases CS;
+	        generator_status ONLINE;
+	        generator_mode SUPPLY_DRIVEN;
+	        panel_type SINGLE_CRYSTAL_SILICON;
+	        area 250 ft^2;
+	        tilt_angle 47.0;
+	        efficiency 0.135;
+		object generator_controller 
+		{ 
+		   	is_block_node true;
+			market Market_pool;
+			generator_rating 80;
+			generator_state OFF;
+			bid_curve  "80 25.00";
+			startup_cost 25.00;
+			shutdown_cost 15.00;
+			minimum_runtime 15 min;
+			minimum_downtime 0 min;
+			amortization_factor 7 1/h;
+		};
+
 	};
 }
+
+object collector {
+        group "class=solar";
+        //flags DELTAMODE;
+        property sum(VA_Out.real), sum(VA_Out.imag);
+        file solar_prod.csv;
+	interval 60;	
+	limit 100000000000;
+   }; 
 
 object multi_recorder {
 	property trip_meter1:measured_real_power,trip_meter2:measured_real_power,trip_meter3:measured_real_power,trip_meter4:measured_real_power,trip_meter5:measured_real_power,trip_meter6:measured_real_power,trip_meter7:measured_real_power,trip_meter8:measured_real_power,trip_meter9:measured_real_power,trip_meter10:measured_real_power,trip_meter11:measured_real_power,trip_meter12:measured_real_power,trip_meter13:measured_real_power,trip_meter14:measured_real_power,trip_meter15:measured_real_power;
@@ -1501,3 +1799,4 @@ object multi_recorder {
 	interval 60;
 	limit 60;
 }
+

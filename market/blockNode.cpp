@@ -178,7 +178,7 @@ void blockNode::startNode(int id) {
 	std::string root = "/home/ubuntu/tmp/eth/1923";
 	std::string datadir = root + "/data/" + stringId;
 
-	string systemString = "bash -c \"geth --bootnodes enode://c2b331b5f60438658807b0cd785731592949567a5bab599cd877b4076771d437e226ac9c32a7330a8f4a9d16b278e8974a53b2e3e3cb849b13672595e25d9034@127.0.0.1:30299 --datadir=";
+	string systemString = "bash -c \"geth --bootnodes enode://4a3e5386bbbea10696080aa6228ca94e5bcd75764c9cc1cc6413e54cb87bc678a6a58363dc25647be5480b1d8bcbb54667c2a8987e6e3d673ab982be847b431a@127.0.0.1:30299 --datadir=";
 	systemString += datadir;
 	systemString += " --identity='mynode-";
 	systemString += stringId;
@@ -186,7 +186,7 @@ void blockNode::startNode(int id) {
 	systemString += stringId;
 	systemString += ") --port=";
 	systemString += stringId;
-	systemString += " --rpc --rpcapi='db,eth,net,web3,admin,personal' --rpcport=";
+	systemString += " --rpc --rpcapi='eth,net,admin,personal' --rpcport=";
 	systemString += stringPort;
 	systemString += " --rpcaddr=127.0.0.1 --rpccorsdomain='*' --ipcpath ";
 	systemString += datadir;
@@ -268,7 +268,7 @@ void blockNode::clearMarket(int id){
 		Json::Value root; // {}
 		root["from"] = "0xad56cedb7d9ee48b3b93f682a9e2d87f80221768";
 		root["to"] = contractAddress;
-		root["gas"] = "0x2DC6C0";
+		root["gas"] = "0xB2D05E00";
 		root["gasPrice"] = "0x430E23400";
 		root["data"] = "0x256a9ea1";
 		string result = c.eth_sendTransaction(root);
