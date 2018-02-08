@@ -20,6 +20,9 @@ public:
 	//static int id;
 	int nodeId;
 	int rpcPort;
+	bool accountCreated;
+	bool accountHasBalance;
+	std::string account;
 	void initNode(int id);
 	void startNode(int id);
 	void clearMarket(int id);

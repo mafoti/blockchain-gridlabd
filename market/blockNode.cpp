@@ -28,18 +28,14 @@
 
 
 using namespace std;
-//ofstream myfile;
-ofstream out("out.txt");
-streambuf *coutbuf = cout.rdbuf();
 
 string contractAddress = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
 
 
 void blockNode::initNode(int id) {
-	//myfile.open ("results.txt");
 
-	cout.rdbuf(out.rdbuf());
-
+	/*accountCreated = false;
+	accountHasBalance = false;
 	nodeId = 30300 + id;
 	rpcPort = 8101 + id;
 	printf("Init nodeId = %d\n", this->nodeId);
@@ -48,7 +44,7 @@ void blockNode::initNode(int id) {
 
 	//stringId :  password for new nodes, port, id
 	std::string stringId(ss.str());
-	std::string root = "/home/ubuntu/tmp/eth/1923";
+	std::string root = "/home/mgdfoti/tmp/eth/1923";
 	std::string datadir = root + "/data/" + stringId;
 
 	const char * dirPath = datadir.c_str();
@@ -60,9 +56,9 @@ void blockNode::initNode(int id) {
 
 		string systemString = "bash -c \"geth --datadir ";
 		systemString += datadir;
-		systemString += " init /home/ubuntu/tmp/eth/1923/genesis.json\"";
+		systemString += " init /home/mgdfoti/tmp/eth/1923/genesis.json\"";
 
-		cout << systemString << endl;
+		//cout << systemString << endl;
 		const char * systemCommand = systemString.c_str();
 		system(systemCommand);
 
@@ -73,68 +69,13 @@ void blockNode::initNode(int id) {
 		systemString += stringId;
 		systemString += ") account new\"";
 
-		cout << systemString << endl;
+		//cout << systemString << endl;
 		systemCommand = systemString.c_str();
 		system(systemCommand);
 
 	}
-	closedir(directory);
+	closedir(directory);*/
 
-	/*std::string keystorePathS = root + "/keystore";
-	const char * keystorePath = keystorePathS.c_str();
-	DIR* directoryKeystore = opendir(keystorePath);
-	if (directoryKeystore == NULL) //if is not directory create it
-	{
-		cout << "directory " << keystorePathS << "does not exist, create it" <<endl;
-		mkdir(keystorePath, 0777);
-	}
-	closedir(directoryKeystore);
-
-
-	std::string accountPathS = keystorePathS + "/" + stringId;
-	const char * accountPath = accountPathS.c_str();
-	DIR* directoryAccount = opendir(accountPath);
-	cout << "account path  " << accountPathS << " exists?" <<endl;
-	if (directoryAccount == NULL) //if is not directory create new account and make keystore folders
-	{
-		cout << "directory " << accountPathS << "does not exist, create it and create a new account" <<endl;
-		mkdir(accountPath, 0777);
-
-		//create new account
-		string systemString = "bash -c \"geth --datadir ";
-		systemString += datadir;
-		systemString += " --password <(echo -n ";
-		systemString += stringId;
-		systemString += ") account new\"";
-
-		cout << systemString << endl;
-		const char * systemCommand = systemString.c_str();
-		system(systemCommand);
-
-		//copy keystore from /home/user/tmp/eth/1923/data/30300 to /home/user/tmp/eth/1923/keystore/30300
-		systemString = "cp -R ";
-		systemString += datadir;
-		systemString += "/keystore ";
-		systemString += accountPathS;
-
-		cout << systemString << endl;
-		systemCommand = systemString.c_str();
-		system(systemCommand);
-
-		//copy keystore from /home/user/tmp/eth/1923/keystore/30300 to /home/user/tmp/eth/1923/data/30300/keystore
-		systemString = "cp -R ";
-		systemString += accountPathS;
-		systemString += "/keystore ";
-		systemString += datadir;
-		systemString += "/keystore";
-
-		cout << systemString << endl;
-		systemCommand = systemString.c_str();
-		system(systemCommand);
-
-	}
-
-	closedir(directoryAccount);*/
 
 }
 
@@ -147,7 +88,7 @@ void blockNode::sendBalance(std::string account) {
 		root["to"] = account;
 		root["value"] = "0x1BC16D674EC80000"; // 2000000000000000000 = 2Eth
 		market.eth_sendTransaction(root);
-		cout << "balance send " << endl;
+		//cout << "balance send " << endl;
 	} catch (jsonrpc::JsonRpcException& e) {
 		cerr << "balance send error " << e.what() << endl;
 	}
@@ -157,10 +98,10 @@ void blockNode::startNode(int id) {
 
 	//copy static-nodes.json
 	//start node
-	nodeId = 30300 + id;
-	rpcPort = 8101 + id;
+	//nodeId = 30300 + id;
+	//rpcPort = 8101 + id;
 
-	printf("nodeId = %d \n", this->nodeId);
+	/*printf("nodeId = %d \n", this->nodeId);
 
 	std::stringstream ss;
 	ss << this->nodeId;
@@ -175,10 +116,10 @@ void blockNode::startNode(int id) {
 	std::string stringPort(sp.str());
 
 
-	std::string root = "/home/ubuntu/tmp/eth/1923";
+	std::string root = "/home/mgdfoti/tmp/eth/1923";
 	std::string datadir = root + "/data/" + stringId;
 
-	string systemString = "bash -c \"geth --bootnodes enode://4a3e5386bbbea10696080aa6228ca94e5bcd75764c9cc1cc6413e54cb87bc678a6a58363dc25647be5480b1d8bcbb54667c2a8987e6e3d673ab982be847b431a@127.0.0.1:30299 --datadir=";
+	string systemString = "bash -c \"geth --bootnodes enode://41ac60c9b55b0dc6a5a9bbf84b9d2af0b83b122cb34ab15b9ae72e9dcb7ec0817604b8f548a1a0c4a21407998e86226f02dcdc2c61d0724c1bfb6361f2043200@127.0.0.1:30299 --fast --cache=512 --datadir=";
 	systemString += datadir;
 	systemString += " --identity='mynode-";
 	systemString += stringId;
@@ -194,31 +135,10 @@ void blockNode::startNode(int id) {
 	systemString += "/log.log > " + datadir;
 	systemString += "/mylog.log  &\"";
 
-	cout << systemString << endl;
+	//cout << systemString << endl;
 	const char * systemCommand = systemString.c_str();
 
-	system(systemCommand);
-
-	//get the address of the newly created account
-	jsonrpc::HttpClient httpclient("http://localhost:"+stringPort);
-	EthereumAPI c(httpclient);
-	Json::Value accounts;
-	bool created = false;
-	while (!created) {
-		try {
-			accounts = c.eth_accounts();
-			cout << "accounts : " << accounts << endl;
-			created = true;
-		} catch (jsonrpc::JsonRpcException& e) {
-			created = false;
-		}
-	}
-
-	/*string balance = c.eth_getBalance(accounts[0].asString(), "latest");
-	cout << "account : " << accounts[0] << "balance : " << balance << endl;
-	if(balance.compare("0x0")==0){
-		sendBalance(accounts[0].asString());
-	}*/
+	system(systemCommand);*/
 
 }
 
@@ -282,9 +202,6 @@ void blockNode::clearMarket(int id){
 
 void blockNode::submitConsumptionBid(int id, int price, int quantity){
 
-	nodeId = 30300 + id;
-	rpcPort = 8101 + id;
-
 	std::stringstream sp;
 	sp << rpcPort;
 	std::string stringPort(sp.str());
@@ -293,54 +210,73 @@ void blockNode::submitConsumptionBid(int id, int price, int quantity){
 	ss << nodeId;
 	std::string stringId(ss.str());
 
-
-	cout << "submitConsumptionBid price : " << price << " quantity : "<< quantity << endl;
-	//output();
-
 	jsonrpc::HttpClient httpclient("http://localhost:" + stringPort);
 	EthereumAPI c(httpclient);
-	Json::Value accounts = c.eth_accounts();
+	Json::Value accounts;
 
-	string balance = c.eth_getBalance(accounts[0].asString(), "latest");
+	if(!accountCreated){
+		try {
+			accounts = c.eth_accounts();
+			accountCreated = true;
+			account = accounts[0].asString();
+			cout << "account : " << account << "created " << accountCreated << endl;
+		} catch (jsonrpc::JsonRpcException& e) {
+			cerr << "eth_accounts submitConsumptionBid error "  << stringPort << " string port" << e.what() << endl;
+		}
+	}
+	if(accountCreated){
+		if(!accountHasBalance){
+			try
+			{
+				string balance = c.eth_getBalance(account, "latest");
+				cout << "account : " << account << " balance "<< balance << endl;
 
-	if(balance.compare("0x0")==0){
-		sendBalance(accounts[0].asString());
+				if(balance.compare("0x0")==0){
+					sendBalance(account);
+					accountHasBalance = false;
+				}else{
+					accountHasBalance = true;
+				}
+			}
+			catch (jsonrpc::JsonRpcException & e)
+			{
+				cerr << "eth_getBalance submitConsumptionBid error " << stringPort << " string port" << e.what() << endl;
+			}
+		}
+		else{
+			try
+			{
+				if(quantity>0){
+					cout << "submitConsumptionBid price : " << price << " quantity : "<< quantity << " account : " << account << endl;
+					std::stringstream priceStream;
+					std::stringstream quantityStream;
+
+					priceStream << setfill('0') << setw(64) << std::hex << price;
+					std::string resultprice( priceStream.str() );
+
+					quantityStream << setfill('0') << setw(64) << std::hex << quantity;
+					std::string resultquantity( quantityStream.str() );
+					Json::Value root;
+					root["from"] = account;
+					root["to"] = contractAddress;
+					root["gas"] = "0x30D40";
+					// root["gasPrice"] = "0x430E23400";
+					root["data"] = "0x7f495ea5"+resultquantity+resultprice;
+					c.eth_sendTransaction(root);
+					//cout << c.eth_accounts() << endl;
+				}
+			}
+			catch (jsonrpc::JsonRpcException & e)
+			{
+				cerr << "submitConsumptionBid error " << stringPort << " string port" << e.what() << endl;
+			}
+		}
+
 	}
 
-	std::stringstream priceStream;
-	std::stringstream quantityStream;
-
-	priceStream << setfill('0') << setw(64) << std::hex << price;
-	std::string resultprice( priceStream.str() );
-
-	quantityStream << setfill('0') << setw(64) << std::hex << quantity;
-	std::string resultquantity( quantityStream.str() );
-
-
-	try
-	{
-		Json::Value root; // {}
-		root["from"] = accounts[0];
-		root["to"] = contractAddress;
-		root["gas"] = "0x30D40";
-		// root["gasPrice"] = "0x430E23400";
-		root["data"] = "0x7f495ea5"+resultquantity+resultprice;
-		c.eth_sendTransaction(root);
-		//cout << c.eth_accounts() << endl;
-	}
-	catch (jsonrpc::JsonRpcException & e)
-	{
-		cerr << "submitConsumptionBid error " << stringPort << " string port" << e.what() << endl;
-	}
 }
 
-
-//"0d31d41a": "generationBid(int256,int256)",
 void blockNode::submitGenerationBid(int id, int price, int quantity){
-	//comment out when gas problem solved
-	nodeId = 30300 + id;
-	rpcPort = 8101 + id;
-
 	std::stringstream sp;
 	sp << rpcPort;
 	std::string stringPort(sp.str());
@@ -349,59 +285,76 @@ void blockNode::submitGenerationBid(int id, int price, int quantity){
 	ss << nodeId;
 	std::string stringId(ss.str());
 
-
-	cout << "submitGenerationBid price : " << price << " quantity : "<< quantity << endl;
-	//output();
-
 	jsonrpc::HttpClient httpclient("http://localhost:" + stringPort);
 	EthereumAPI c(httpclient);
-	Json::Value accounts = c.eth_accounts();
+	Json::Value accounts;
+	if(!accountCreated){
+		try {
+			accounts = c.eth_accounts();
+			accountCreated = true;
+			account = accounts[0].asString();
+			cout << "account : " << account << "created " << accountCreated << endl;
 
-	string balance = c.eth_getBalance(accounts[0].asString(), "latest");
-
-	if(balance.compare("0x0")==0){
-		sendBalance(accounts[0].asString());
+		} catch (jsonrpc::JsonRpcException& e) {
+			cerr << "eth_accounts submitGenerationBid error "  << stringPort << " string port" << e.what() << endl;
+		}
 	}
 
-	std::stringstream priceStream;
-	std::stringstream quantityStream;
+	if(accountCreated){
+		if(!accountHasBalance){
+			try
+			{
+				string balance = c.eth_getBalance(account, "latest");
+				cout << "account : " << account << " balance "<< balance << endl;
+				if(balance.compare("0x0")==0){
 
-	priceStream << setfill('0') << setw(64) << std::hex << price;
-	std::string resultprice( priceStream.str() );
+					sendBalance(account);
+					accountHasBalance = false;
+				}else{
+					accountHasBalance = true;
+				}
+			}
+			catch (jsonrpc::JsonRpcException & e)
+			{
+				cerr << "eth_getBalance submitGenerationBid error "  << stringPort << " string port" << e.what() << endl;
+			}
+		}
+		else{
+			try
+			{
+				if(quantity>0){
+					cout << "submitGenerationBid price : " << price << " quantity : "<< quantity << " account : " << account << endl;
+					std::stringstream priceStream;
+					std::stringstream quantityStream;
+
+					priceStream << setfill('0') << setw(64) << std::hex << price;
+					std::string resultprice( priceStream.str() );
 
 
-	quantityStream << setfill('0') << setw(64) << std::hex << quantity;
-	std::string resultquantity( quantityStream.str() );
-
-	//cout << "submitGenerationBid priceHEX:" << resultprice << " quantityHEX:" << resultquantity << endl;
-
-	try
-	{
-		//contract address: 0x4291ae232bcbeb5a64b612a971384efac3dab88d
-		//default account : 0xad56cedb7d9ee48b3b93f682a9e2d87f80221768
-		// 027cb7c6 clear();
-		//Json::Value result = "\"from\": \"0x1d1ae163d75d6689c6c70c7367bbd08ac5361e4e\", \"to\": \"0x35bc45bb2c4c8f311ed9e0e867287ecb9ca90f8b\", \"data\": \"0x256a9ea1\"";
-		Json::Value root; // {}
-		root["from"] = accounts[0];
-		root["to"] = contractAddress;
-		root["gas"] = "0x30D40";
-		// root["gasPrice"] = "0x430E23400";
-		root["data"] = "0x0d31d41a"+resultquantity+resultprice;
-		c.eth_sendTransaction(root);
-		//cout << c.eth_accounts() << endl;
-	}
-	catch (jsonrpc::JsonRpcException & e)
-	{
-		cerr << "submitGenerationBid error " << e.what() << endl;
+					quantityStream << setfill('0') << setw(64) << std::hex << quantity;
+					std::string resultquantity( quantityStream.str() );
+					Json::Value root; // {}
+					root["from"] = account;
+					root["to"] = contractAddress;
+					root["gas"] = "0x30D40";
+					// root["gasPrice"] = "0x430E23400";
+					root["data"] = "0x0d31d41a"+resultquantity+resultprice;
+					c.eth_sendTransaction(root);
+					//cout << c.eth_accounts() << endl;
+				}
+			}
+			catch (jsonrpc::JsonRpcException & e)
+			{
+				cerr << "submitGenerationBid error "  << stringPort << " string port" << e.what() << endl;
+			}
+		}
 	}
 }
 
 marketStruct blockNode::readClearing(int id) {
 	marketStruct market = marketStruct();
-	nodeId = 30300 + id;
-	rpcPort = 8101 + id;
 
-	std::stringstream sp;
+	/*std::stringstream sp;
 	sp << rpcPort;
 	std::string stringPort(sp.str());
 
@@ -411,7 +364,7 @@ marketStruct blockNode::readClearing(int id) {
 
 	jsonrpc::HttpClient httpclient("http://localhost:" + stringPort);
 	EthereumAPI c(httpclient);
-	Json::Value accounts = c.eth_accounts();
+	Json::Value accounts = c.eth_accounts();*/
 
 	/*market.price = result["clearingPrice"].asInt();
 	market.quantity = result["clearingQuantity"].asInt();

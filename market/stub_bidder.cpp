@@ -68,7 +68,7 @@ int stub_bidder::init(OBJECT *parent)
 	}
 	if(is_block_node){
 		OBJECT *obj=OBJECTHDR(this);
-		this->blockchain.startNode(obj->id);
+		//this->blockchain.startNode(obj->id);
 	}
 	return SUCCESS;
 }

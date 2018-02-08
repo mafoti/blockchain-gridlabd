@@ -8,8 +8,9 @@
 #define stylesheet=http://gridlab-d.svn.sourceforge.net/viewvc/gridlab-d/trunk/core/gridlabd-2_0
 
 clock {
-	timestamp '2000-01-01 0:00:00';
-	stoptime '2000-01-10 1:00:00';
+	timezone EU/GR/Athens;
+	starttime '2018-02-01 0:00:00';
+	stoptime '2018-02-28 0:00:00';
 }
 
 module tape;
@@ -19,6 +20,13 @@ module powerflow {
 };
 module generators;
 module climate;
+
+object climate {
+     name "Seattle WA";
+     tmyfile "WA-Seattle.tmy2";
+     interpolate QUADRATIC;
+};
+
 module residential {
 	implicit_enduses NONE;
 	ANSI_voltage_check FALSE;
@@ -1667,49 +1675,11 @@ object house:..20 {
 	cooling_COP 2.5;
 }
 
-// House 13
-object house:..20 {
-	parent trip_meter13;
-	schedule_skew random.normal(3600,-3600);
-	heating_system_type HEAT_PUMP;
-	cooling_system_type ELECTRIC;
-
-	object controller {
-	   is_block_node true;
-	   schedule_skew random.normal(3600,-3600);
-	   market Market_pool;
-	   bid_mode ON;
-	   control_mode DOUBLE_RAMP;
-	   resolve_mode DEADBAND;
-	   slider_setting_heat 0.500;
-	   slider_setting_cool 0.500;
-	   heating_base_setpoint 66;
-	   cooling_base_setpoint 72;
-	   period 60;
-	   average_target current_price_mean_24h;
-	   standard_deviation_target current_price_stdev_24h;
-	   target air_temperature;
-	   heating_setpoint heating_setpoint;
-	   heating_demand last_heating_load;
-	   cooling_setpoint cooling_setpoint;
-	   cooling_demand last_cooling_load;
-	   deadband thermostat_deadband;
-	   total hvac_load;
-	   load hvac_load;
-	   state power_state;
-	};
-
-	thermal_integrity_level 3;
-	air_temperature 70;
-	mass_temperature 70;
-	cooling_COP 2.5;
-}
-
 
 // Inverters 1
 object inverter:..20 {
-	phases BS;
-	parent trip_meter14;
+	phases AS;
+	parent trip_meter13;
 	inverter_efficiency .95;
 	rated_power 6000;	
         generator_mode CONSTANT_PF;
@@ -1725,7 +1695,7 @@ object inverter:..20 {
 	        generator_status ONLINE;
 	        generator_mode SUPPLY_DRIVEN;
 	        panel_type SINGLE_CRYSTAL_SILICON;
-	        area 250 ft^2;
+	        area 2500 sf;
 	        tilt_angle 47.0;
 	        efficiency 0.135;
 		object generator_controller 
@@ -1747,8 +1717,8 @@ object inverter:..20 {
 
 // Inverters 2
 object inverter:..20 {
-	phases CS;
-	parent trip_meter15;
+	phases BS;
+	parent trip_meter14;
 	inverter_efficiency .95;
 	rated_power 6000;	
         generator_mode CONSTANT_PF;
@@ -1764,7 +1734,7 @@ object inverter:..20 {
 	        generator_status ONLINE;
 	        generator_mode SUPPLY_DRIVEN;
 	        panel_type SINGLE_CRYSTAL_SILICON;
-	        area 250 ft^2;
+	        area 2500 sf;
 	        tilt_angle 47.0;
 	        efficiency 0.135;
 		object generator_controller 
@@ -1784,19 +1754,147 @@ object inverter:..20 {
 	};
 }
 
-object collector {
-        group "class=solar";
+// Inverters 3
+object inverter:..20 {
+	phases CS;
+	parent trip_meter15;
+	inverter_efficiency .95;
+	rated_power 6000;	
+        generator_mode CONSTANT_PF;
+        generator_status ONLINE;
+        inverter_type PWM; 
         //flags DELTAMODE;
-        property sum(VA_Out.real), sum(VA_Out.imag);
-        file solar_prod.csv;
-	interval 60;	
-	limit 100000000000;
-   }; 
+        dynamic_model_mode PID;
+        inverter_convergence_criterion 0.001;
+        power_factor 1.0;
+        object solar {
+	        price 0.12;
+	        phases CS;
+	        generator_status ONLINE;
+	        generator_mode SUPPLY_DRIVEN;
+	        panel_type SINGLE_CRYSTAL_SILICON;
+	        area 2500 sf;
+	        tilt_angle 47.0;
+	        efficiency 0.2;
+		object generator_controller 
+		{ 
+		   	is_block_node true;
+			market Market_pool;
+			generator_rating 80;
+			generator_state OFF;
+			bid_curve  "80 25.00";
+			startup_cost 25.00;
+			shutdown_cost 15.00;
+			minimum_runtime 15 min;
+			minimum_downtime 0 min;
+			amortization_factor 7 1/h;
+		};
 
-object multi_recorder {
-	property trip_meter1:measured_real_power,trip_meter2:measured_real_power,trip_meter3:measured_real_power,trip_meter4:measured_real_power,trip_meter5:measured_real_power,trip_meter6:measured_real_power,trip_meter7:measured_real_power,trip_meter8:measured_real_power,trip_meter9:measured_real_power,trip_meter10:measured_real_power,trip_meter11:measured_real_power,trip_meter12:measured_real_power,trip_meter13:measured_real_power,trip_meter14:measured_real_power,trip_meter15:measured_real_power;
-	file "IEEE_13_Node_With_Houses.csv";
-	interval 60;
-	limit 60;
+	};
+}
+
+// Add GE wind turbine
+object transformer_configuration:600 {
+	connect_type WYE_WYE;
+	power_rating 3000;
+	primary_voltage 4160;
+	secondary_voltage 690;
+	resistance 0.01;
+	reactance 0.06;
+	install_type PADMOUNT;
+}
+
+object transformer {
+	phases "ABCN";
+	from node:692;
+	to wind_meter;
+	configuration transformer_configuration:600;
+}
+
+object meter {
+	name wind_meter;
+	phases ABCN;
+	nominal_voltage 400;
+}
+
+
+object windturb_dg  {
+	parent wind_meter;
+	phases ABCN;
+	price 0.14;
+	name windtownE2_692A;
+	Gen_status ONLINE;
+	Gen_type SYNCHRONOUS;
+	Gen_mode CONSTANTP;
+	Turbine_Model GE_25MW;
+
+	object generator_controller 
+	{ 
+		name gentown2_winEd692A;
+		is_block_node true;
+		market Market_pool;
+		generator_rating 80;
+		generator_state OFF;
+		bid_curve  "80 25.00";
+		startup_cost 25.00;
+		shutdown_cost 15.00;
+		minimum_runtime 15 min;
+		minimum_downtime 0 min;
+		amortization_factor 7 1/h;
+
+	};
+}
+   
+   
+object windturb_dg  {
+	parent wind_meter;
+	phases ABCN;
+	price 0.16;
+	name windtownE22_692A;
+	Gen_status ONLINE;
+	Gen_type SYNCHRONOUS;
+	Gen_mode CONSTANTP;
+	Turbine_Model GE_25MW;
+	object generator_controller 
+	{ 
+		name gentown2_winE2d692A;
+		is_block_node true;
+		market Market_pool;
+		generator_rating 80;
+		generator_state OFF;
+		bid_curve  "80 25.00";
+		startup_cost 25.00;
+		shutdown_cost 15.00;
+		minimum_runtime 15 min;
+		minimum_downtime 0 min;
+		amortization_factor 7 1/h;
+	};
+}
+
+object windturb_dg  {
+	parent wind_meter;
+	phases ABCN;
+	price 0.18;
+	name windtown2_692A;
+	Gen_status ONLINE;
+	Gen_type SYNCHRONOUS;
+	Gen_mode CONSTANTP;
+	Turbine_Model GENERIC_SYNCH_LARGE;
+
+	object generator_controller 
+	{ 
+		name gentown2_wind692A;
+		is_block_node true;
+		market Market_pool;
+		generator_rating 80;
+		generator_state OFF;
+		bid_curve  "80 25.00";
+		startup_cost 25.00;
+		shutdown_cost 15.00;
+		minimum_runtime 15 min;
+		minimum_downtime 0 min;
+		amortization_factor 7 1/h;
+	};
+
 }
 
