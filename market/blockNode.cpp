@@ -34,7 +34,7 @@ string contractAddress = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
 
 void blockNode::initNode(int id) {
 
-	/*accountCreated = false;
+	accountCreated = false;
 	accountHasBalance = false;
 	nodeId = 30300 + id;
 	rpcPort = 8101 + id;
@@ -74,7 +74,7 @@ void blockNode::initNode(int id) {
 		system(systemCommand);
 
 	}
-	closedir(directory);*/
+	closedir(directory);
 
 
 }
@@ -101,7 +101,7 @@ void blockNode::startNode(int id) {
 	//nodeId = 30300 + id;
 	//rpcPort = 8101 + id;
 
-	/*printf("nodeId = %d \n", this->nodeId);
+	printf("nodeId = %d \n", this->nodeId);
 
 	std::stringstream ss;
 	ss << this->nodeId;
@@ -138,7 +138,7 @@ void blockNode::startNode(int id) {
 	//cout << systemString << endl;
 	const char * systemCommand = systemString.c_str();
 
-	system(systemCommand);*/
+	system(systemCommand);
 
 }
 
@@ -354,7 +354,7 @@ void blockNode::submitGenerationBid(int id, int price, int quantity){
 marketStruct blockNode::readClearing(int id) {
 	marketStruct market = marketStruct();
 
-	/*std::stringstream sp;
+	std::stringstream sp;
 	sp << rpcPort;
 	std::string stringPort(sp.str());
 
@@ -364,7 +364,7 @@ marketStruct blockNode::readClearing(int id) {
 
 	jsonrpc::HttpClient httpclient("http://localhost:" + stringPort);
 	EthereumAPI c(httpclient);
-	Json::Value accounts = c.eth_accounts();*/
+	Json::Value accounts = c.eth_accounts();
 
 	/*market.price = result["clearingPrice"].asInt();
 	market.quantity = result["clearingQuantity"].asInt();
