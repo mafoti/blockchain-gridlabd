@@ -18,6 +18,7 @@ public:
 public:
 	blockNode blockchain;
 	bool is_block_node;
+	char32 url;
 	double bid_period;
 	int16 count;
 	OBJECT *market;

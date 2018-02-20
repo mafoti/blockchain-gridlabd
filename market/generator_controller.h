@@ -19,6 +19,7 @@ public:
 public:
 	blockNode blockchain;
 	bool is_block_node;
+	char32 url;
 	typedef struct s_curvedetails {	//Declare in here in case we ever need it externally
 		double power_start;		/// Starting point of this linear section
 		double power_stop;		/// Stopping point of this linear section

@@ -132,6 +132,7 @@ controller::controller(MODULE *module){
 			PT_int32, "bid_delay", PADDR(bid_delay),
 			PT_char32, "thermostat_state", PADDR(thermostat_state), PT_DESCRIPTION, "The name of the thermostat state property within the object being controlled",
 			PT_bool, "is_block_node", PADDR(is_block_node),
+			PT_char32, "url", PADDR(url), PT_DESCRIPTION, "the url of the blockchain node",
 			// PROXY PROPERTIES
 			PT_double, "proxy_average", PADDR(proxy_avg),
 			PT_double, "proxy_standard_deviation", PADDR(proxy_std),
@@ -205,6 +206,7 @@ int controller::create(){
 	controller_bid2.bid_accepted = true;
 	bid_id = -1;
 	OBJECT *hdr = OBJECTHDR(this);
+
 	this->blockchain.initNode(hdr->id);
 
 
@@ -332,7 +334,7 @@ int controller::init(OBJECT *parent){
 		is_block_node=false;
 	}
 	if(is_block_node){
-		this->blockchain.startNode(hdr->id);
+		this->blockchain.startNode(url.get_string());
 	}
 	char tname[32];
 	char *namestr = (hdr->name ? hdr->name : tname);
@@ -1665,6 +1667,10 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 
 	}
 	else if (control_mode == CN_DOUBLE_RAMP){
+		this->blockchain.readClearing();
+		clrP = this->blockchain.getLastPrice();
+		avgP = this->blockchain.getAvgPrice();
+		stdP = this->blockchain.getStdPrice();
 		/*
 		double heat_range_high;
 		double heat_range_low;
@@ -1895,7 +1901,7 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 					//submit transaction bid
 					int price = (int)(controller_bid.price * 100);
 					int quantity = (int)(controller_bid.quantity * 100);
-					this->blockchain.submitConsumptionBid(hdr->id, price, fabs(quantity));
+					this->blockchain.submitConsumptionBid(price, fabs(quantity));
 				}
 			} else {
 				controller_bid.state = BS_UNKNOWN;
@@ -1905,7 +1911,7 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 					//submit transaction bid
 					int price = (int)(controller_bid.price * 100);
 					int quantity = (int)(controller_bid.quantity * 100);
-					this->blockchain.submitConsumptionBid(hdr->id, price, fabs(quantity));
+					this->blockchain.submitConsumptionBid(price, fabs(quantity));
 				}
 			}
 			if(controller_bid.bid_accepted == false){
@@ -1932,7 +1938,7 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 					//submit transaction bid
 					int price = (int)(controller_bid.price * 100);
 					int quantity = (int)(controller_bid.quantity * 100);
-					this->blockchain.submitConsumptionBid(hdr->id, price, fabs(quantity));
+					this->blockchain.submitConsumptionBid(price, fabs(quantity));
 				}
 				if(controller_bid.bid_accepted == false){
 					return TS_INVALID;
@@ -1960,6 +1966,7 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 }
 
 TIMESTAMP controller::postsync(TIMESTAMP t0, TIMESTAMP t1){
+
 	TIMESTAMP rv = next_run - bid_delay;
 	if(last_setpoint != setpoint0 && control_mode == CN_RAMP){
 		last_setpoint = setpoint0;

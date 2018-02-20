@@ -60,6 +60,7 @@ generator_controller::generator_controller(MODULE *module){
 			PT_double, "op_and_maint_cost[$]", PADDR(op_and_maint_cost), PT_DESCRIPTION, "Operation and maintenance cost per runtime year",
 			PT_int64, "bid_id", PADDR(bid_id),
 			PT_bool, "is_block_node", PADDR(is_block_node),
+			PT_char32, "url", PADDR(url), PT_DESCRIPTION, "the url of the blockchain node",
 			NULL) < 1) GL_THROW("unable to publish properties in %s",__FILE__);
 	}
 }
@@ -160,6 +161,7 @@ int generator_controller::create(void)
 	controller_bid.bid_accepted = true;
 	bid_id = -1;
 	OBJECT *hdr = OBJECTHDR(this);
+
 	this->blockchain.initNode(hdr->id);
 	return 1;
 }
@@ -171,7 +173,7 @@ int generator_controller::init(OBJECT *parent)
 		is_block_node=false;
 	}
 	if(is_block_node){
-		this->blockchain.startNode(obj->id);
+		this->blockchain.startNode(url.get_string());
 	}
 	parent2=parent;
 	PROPERTY *ptemp;
@@ -1173,7 +1175,7 @@ TIMESTAMP generator_controller::sync(TIMESTAMP t0, TIMESTAMP t1)
 					if(is_block_node){
 						int price = (int)(controller_bid.price * 100);
 						int quantity = (int)(controller_bid.quantity * 100);
-						this->blockchain.submitGenerationBid(obj->id, price, fabs(quantity));
+						this->blockchain.submitGenerationBid(price, fabs(quantity));
 					}
 					((void (*)(char *, char *, char *, char *, void *, size_t))(*submit))((char *)gl_name(obj, ctrname, 1024), (char *)gl_name(market_object, mktname, 1024), "submit_bid_state", "auction", (void *)&controller_bid, (size_t)sizeof(controller_bid));
 					if(controller_bid.bid_accepted == false){
@@ -1241,7 +1243,7 @@ TIMESTAMP generator_controller::sync(TIMESTAMP t0, TIMESTAMP t1)
 					if(is_block_node){
 						int price = (int)(controller_bid.price * 100);
 						int quantity = (int)(controller_bid.quantity * 100);
-						this->blockchain.submitGenerationBid(obj->id, price, fabs(quantity));
+						this->blockchain.submitGenerationBid(price, fabs(quantity));
 					}
 					((void (*)(char *, char *, char *, char *, void *, size_t))(*submit))((char *)gl_name(obj, ctrname, 1024), (char *)gl_name(market_object, mktname, 1024), "submit_bid_state", "auction", (void *)&controller_bid, (size_t)sizeof(controller_bid));
 					if(controller_bid.bid_accepted == false){

@@ -12,6 +12,7 @@ stub_bidder::stub_bidder(MODULE *module)
 
 		if (gl_publish_variable(oclass,
 				PT_bool, "is_block_node", PADDR(is_block_node),
+				PT_char32, "url", PADDR(url), PT_DESCRIPTION, "the url of the blockchain node",
 				PT_double, "bid_period[s]", PADDR(bid_period),
 				PT_int16, "count", PADDR(count),
 				PT_object, "market", PADDR(market),
@@ -35,6 +36,7 @@ int stub_bidder::create()
 	controller_bid.bid_accepted = true;
 	bid_id = -1;
 	OBJECT *obj=OBJECTHDR(this);
+
 	this->blockchain.initNode(obj->id);
 	return SUCCESS;
 }
@@ -68,7 +70,7 @@ int stub_bidder::init(OBJECT *parent)
 	}
 	if(is_block_node){
 		OBJECT *obj=OBJECTHDR(this);
-		this->blockchain.startNode(obj->id);
+		this->blockchain.startNode(url.get_string());
 	}
 	return SUCCESS;
 }
@@ -104,7 +106,7 @@ TIMESTAMP stub_bidder::sync(TIMESTAMP t0, TIMESTAMP t1)
 			//submit transaction bid
 			int price = (int)(controller_bid.price * 100);
 			int quantity = (int)(controller_bid.quantity * 100);
-			this->blockchain.submitGenerationBid(hdr->id, price, fabs(quantity));
+			this->blockchain.submitGenerationBid(price, fabs(quantity));
 		}
 		if(controller_bid.bid_accepted == false){
 			return TS_INVALID;

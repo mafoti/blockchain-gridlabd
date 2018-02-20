@@ -38,10 +38,11 @@ class auction {
 }
 object auction {
     is_block_node true;
+    url 10.96.12.69;
     name Market_pool;
     special_mode NONE;
     unit kW;
-    period 60;
+    period 900;
     init_price 0.14;
     init_stdev 5;
     warmup 0;
@@ -55,9 +56,10 @@ object auction {
 
 object stub_bidder {
 	is_block_node true;
+        url 10.96.12.69;
 	name buyer_1;
 	role SELLER;
-	bid_period 60;
+	bid_period 900;
 	market Market_pool;
 	price 0.3;
 	quantity 2400;
@@ -1228,6 +1230,7 @@ object house:..20 {
 
      object controller {
 	   is_block_node true;
+    	   url 10.96.12.69;
            schedule_skew random.normal(3600,-3600);
            market Market_pool;
            bid_mode ON;
@@ -1237,7 +1240,7 @@ object house:..20 {
            slider_setting_cool 0.500;
            heating_base_setpoint 66;
            cooling_base_setpoint 72;
-           period 60;
+           period 900;
            average_target current_price_mean_24h;
            standard_deviation_target current_price_stdev_24h;
            target air_temperature;
@@ -1266,6 +1269,7 @@ object house:..20 {
 
 	object controller {
 	   is_block_node true;
+    	   url 10.96.12.69;
 	   schedule_skew random.normal(3600,-3600);
 	   market Market_pool;
 	   bid_mode ON;
@@ -1275,7 +1279,7 @@ object house:..20 {
 	   slider_setting_cool 0.500;
 	   heating_base_setpoint 66;
 	   cooling_base_setpoint 72;
-	   period 60;
+	   period 900;
 	   average_target current_price_mean_24h;
 	   standard_deviation_target current_price_stdev_24h;
 	   target air_temperature;
@@ -1304,6 +1308,7 @@ object house:..20 {
 
 	object controller {
 	   is_block_node true;
+    	   url 10.96.12.69;
 	   schedule_skew random.normal(3600,-3600);
 	   market Market_pool;
 	   bid_mode ON;
@@ -1313,7 +1318,7 @@ object house:..20 {
 	   slider_setting_cool 0.500;
 	   heating_base_setpoint 66;
 	   cooling_base_setpoint 72;
-	   period 60;
+	   period 900;
 	   average_target current_price_mean_24h;
 	   standard_deviation_target current_price_stdev_24h;
 	   target air_temperature;
@@ -1342,6 +1347,7 @@ object house:..20 {
 
 	object controller {
 	   is_block_node true;
+    	   url 10.96.12.69;
 	   schedule_skew random.normal(3600,-3600);
 	   market Market_pool;
 	   bid_mode ON;
@@ -1351,7 +1357,7 @@ object house:..20 {
 	   slider_setting_cool 0.500;
 	   heating_base_setpoint 66;
 	   cooling_base_setpoint 72;
-	   period 60;
+	   period 900;
 	   average_target current_price_mean_24h;
 	   standard_deviation_target current_price_stdev_24h;
 	   target air_temperature;
@@ -1380,6 +1386,7 @@ object house:..20 {
 
 	object controller {
 	   is_block_node true;
+    	   url 10.96.12.69;
 	   schedule_skew random.normal(3600,-3600);
 	   market Market_pool;
 	   bid_mode ON;
@@ -1389,7 +1396,7 @@ object house:..20 {
 	   slider_setting_cool 0.500;
 	   heating_base_setpoint 66;
 	   cooling_base_setpoint 72;
-	   period 60;
+	   period 900;
 	   average_target current_price_mean_24h;
 	   standard_deviation_target current_price_stdev_24h;
 	   target air_temperature;
@@ -1418,6 +1425,7 @@ object house:..20 {
 
 	object controller {
 	   is_block_node true;
+    	   url 10.96.12.69;
 	   schedule_skew random.normal(3600,-3600);
 	   market Market_pool;
 	   bid_mode ON;
@@ -1427,7 +1435,7 @@ object house:..20 {
 	   slider_setting_cool 0.500;
 	   heating_base_setpoint 66;
 	   cooling_base_setpoint 72;
-	   period 60;
+	   period 900;
 	   average_target current_price_mean_24h;
 	   standard_deviation_target current_price_stdev_24h;
 	   target air_temperature;
@@ -1456,6 +1464,7 @@ object house:..20 {
 
 	object controller {
 	   is_block_node true;
+    	   url 10.96.12.69;
 	   schedule_skew random.normal(3600,-3600);
 	   market Market_pool;
 	   bid_mode ON;
@@ -1465,7 +1474,7 @@ object house:..20 {
 	   slider_setting_cool 0.500;
 	   heating_base_setpoint 66;
 	   cooling_base_setpoint 72;
-	   period 60;
+	   period 900;
 	   average_target current_price_mean_24h;
 	   standard_deviation_target current_price_stdev_24h;
 	   target air_temperature;
@@ -1494,6 +1503,7 @@ object house:..20 {
 
 	object controller {
 	   is_block_node true;
+    	   url 10.96.12.69;
 	   schedule_skew random.normal(3600,-3600);
 	   market Market_pool;
 	   bid_mode ON;
@@ -1503,7 +1513,7 @@ object house:..20 {
 	   slider_setting_cool 0.500;
 	   heating_base_setpoint 66;
 	   cooling_base_setpoint 72;
-	   period 60;
+	   period 900;
 	   average_target current_price_mean_24h;
 	   standard_deviation_target current_price_stdev_24h;
 	   target air_temperature;
@@ -1532,6 +1542,7 @@ object house:..20 {
 
 	object controller {
 	   is_block_node true;
+    	   url 10.96.12.69;
 	   schedule_skew random.normal(3600,-3600);
 	   market Market_pool;
 	   bid_mode ON;
@@ -1541,7 +1552,7 @@ object house:..20 {
 	   slider_setting_cool 0.500;
 	   heating_base_setpoint 66;
 	   cooling_base_setpoint 72;
-	   period 60;
+	   period 900;
 	   average_target current_price_mean_24h;
 	   standard_deviation_target current_price_stdev_24h;
 	   target air_temperature;
@@ -1570,6 +1581,7 @@ object house:..20 {
 
 	object controller {
 	   is_block_node true;
+    	   url 10.96.12.69;
 	   schedule_skew random.normal(3600,-3600);
 	   market Market_pool;
 	   bid_mode ON;
@@ -1579,7 +1591,7 @@ object house:..20 {
 	   slider_setting_cool 0.500;
 	   heating_base_setpoint 66;
 	   cooling_base_setpoint 72;
-	   period 60;
+	   period 900;
 	   average_target current_price_mean_24h;
 	   standard_deviation_target current_price_stdev_24h;
 	   target air_temperature;
@@ -1608,6 +1620,7 @@ object house:..20 {
 
 	object controller {
 	   is_block_node true;
+    	   url 10.96.12.69;
 	   schedule_skew random.normal(3600,-3600);
 	   market Market_pool;
 	   bid_mode ON;
@@ -1617,7 +1630,7 @@ object house:..20 {
 	   slider_setting_cool 0.500;
 	   heating_base_setpoint 66;
 	   cooling_base_setpoint 72;
-	   period 60;
+	   period 900;
 	   average_target current_price_mean_24h;
 	   standard_deviation_target current_price_stdev_24h;
 	   target air_temperature;
@@ -1646,6 +1659,7 @@ object house:..20 {
 
 	object controller {
 	   is_block_node true;
+    	   url 10.96.12.69;
 	   schedule_skew random.normal(3600,-3600);
 	   market Market_pool;
 	   bid_mode ON;
@@ -1655,7 +1669,7 @@ object house:..20 {
 	   slider_setting_cool 0.500;
 	   heating_base_setpoint 66;
 	   cooling_base_setpoint 72;
-	   period 60;
+	   period 900;
 	   average_target current_price_mean_24h;
 	   standard_deviation_target current_price_stdev_24h;
 	   target air_temperature;
@@ -1701,6 +1715,7 @@ object inverter:..20 {
 		object generator_controller 
 		{ 
 		   	is_block_node true;
+    	   		url 10.96.12.69;
 			market Market_pool;
 			generator_rating 80;
 			generator_state OFF;
@@ -1740,6 +1755,7 @@ object inverter:..20 {
 		object generator_controller 
 		{ 
 		   	is_block_node true;
+    	   		url 10.96.12.69;
 			market Market_pool;
 			generator_rating 80;
 			generator_state OFF;
@@ -1779,6 +1795,7 @@ object inverter:..20 {
 		object generator_controller 
 		{ 
 		   	is_block_node true;
+    	   		url 10.96.12.69;
 			market Market_pool;
 			generator_rating 80;
 			generator_state OFF;
@@ -1832,6 +1849,7 @@ object windturb_dg  {
 	{ 
 		name gentown2_winEd692A;
 		is_block_node true;
+    	   	url 10.96.12.69;
 		market Market_pool;
 		generator_rating 80;
 		generator_state OFF;
@@ -1859,6 +1877,7 @@ object windturb_dg  {
 	{ 
 		name gentown2_winE2d692A;
 		is_block_node true;
+    	   	url 10.96.12.69;
 		market Market_pool;
 		generator_rating 80;
 		generator_state OFF;
@@ -1885,6 +1904,7 @@ object windturb_dg  {
 	{ 
 		name gentown2_wind692A;
 		is_block_node true;
+    	   	url 10.96.12.69;
 		market Market_pool;
 		generator_rating 80;
 		generator_state OFF;

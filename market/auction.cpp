@@ -84,6 +84,7 @@ auction::auction(MODULE *module)
 
 		if (gl_publish_variable(oclass,
 			PT_bool, "is_block_node", PADDR(is_block_node),
+			PT_char32, "url", PADDR(url), PT_DESCRIPTION, "the url of the blockchain node",
 			PT_char32, "unit", PADDR(unit), PT_DESCRIPTION, "unit of quantity",
 			PT_double, "period[s]", PADDR(dPeriod), PT_DESCRIPTION, "interval of time between market clearings",
 			PT_double, "latency[s]", PADDR(dLatency), PT_DESCRIPTION, "latency between market clearing and delivery", 
@@ -241,6 +242,8 @@ int auction::create(void)
 	statistic_mode = ST_ON;
 
 	OBJECT *obj=OBJECTHDR(this);
+
+
 	this->blockchain.initNode(obj->id);
 
 	return 1; /* return 1 on success, 0 on failure */
@@ -255,7 +258,7 @@ int auction::init(OBJECT *parent)
 		is_block_node=false;
 	}
 	if(is_block_node){
-		this->blockchain.startNode(obj->id);
+		this->blockchain.startNode(url.get_string());
 	}
 	unsigned int i = 0;
 	if(capacity_reference_object != NULL){
@@ -875,7 +878,7 @@ void auction::clear_market(void)
 {
 	OBJECT *obj=OBJECTHDR(this);
 	if(is_block_node){
-		 this->blockchain.clearMarket(obj->id);
+		 this->blockchain.clearMarket();
 	}
 	unsigned int sph24 = (unsigned int)(3600/period*24);
 	BID unresponsive;
