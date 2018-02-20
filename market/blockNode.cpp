@@ -293,7 +293,7 @@ void blockNode::submitGenerationBid(int price, int quantity){
 
 void blockNode::readClearing() {
 
-	/*jsonrpc::HttpClient httpclient("http://" + blockChain_url + ":" + stringPort);
+	jsonrpc::HttpClient httpclient("http://" + blockChain_url + ":" + stringPort);
 	EthereumAPI c(httpclient);
 	Json::Value accounts;
 
@@ -336,7 +336,7 @@ void blockNode::readClearing() {
 		{
 			cerr << e.what() << endl;
 		}
-	}*/
+	}
 
 }
 
