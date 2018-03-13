@@ -293,8 +293,8 @@ void blockNode::submitGenerationBid(int price, int quantity){
 
 void blockNode::readClearing(char t[]) {
 
-	jsonrpc::HttpClient httpclient("http://" + blockChain_url + ":" + stringPort);
-	//jsonrpc::HttpClient httpclient("http://127.0.0.1:8100");
+	//jsonrpc::HttpClient httpclient("http://" + blockChain_url + ":" + stringPort);
+	jsonrpc::HttpClient httpclient("http://127.0.0.1:8100");
 	EthereumAPI c(httpclient);
 	Json::Value accounts;
 
@@ -313,7 +313,8 @@ void blockNode::readClearing(char t[]) {
 			Json::Value result = c.eth_getMarketClearing();
 			cout << "get market clearing result " << result << endl;
 			std::ofstream myfile;
-			myfile.open("clearingResults.txt", std::ios_base::app);
+			string fileName = "clearingResults" + stringPort + ".txt";
+			myfile.open(fileName.c_str(), std::ios_base::app);
 			if (myfile.is_open()) {
 				myfile << t << endl;
 				myfile << result << endl;

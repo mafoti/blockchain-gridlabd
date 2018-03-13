@@ -1,5 +1,5 @@
 # file...... climate_out.csv
-# date...... Tue Mar 13 13:44:18 2018
+# date...... Tue Mar 13 13:58:56 2018
 # user...... ubuntu
 # host...... (null)
 # target.... climate 3
@@ -7,4 +7,4 @@
 # interval.. 3600
 # limit..... 120
 # timestamp,temperature,solar_global,solar_direct
-2018-03-13 11:44:08 UTC,+53.962,+38.4619,+28.7999
+2018-03-13 11:58:46 UTC,+53.962,+38.4619,+28.7999

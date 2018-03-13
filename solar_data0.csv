@@ -1,5 +1,5 @@
 # file...... solar_data0.csv
-# date...... Tue Mar 13 13:44:18 2018
+# date...... Tue Mar 13 13:58:56 2018
 # user...... ubuntu
 # host...... (null)
 # target.... solar 16
@@ -7,4 +7,4 @@
 # interval.. 60
 # limit..... 1000000
 # timestamp,VA_Out,price
-2018-03-13 11:44:08 UTC,+22905.6+0j,+0.12
+2018-03-13 11:58:46 UTC,+22905.6+0j,+0.12

@@ -10,7 +10,7 @@
 clock {
 	timezone EU/GR/Athens;
 	starttime '2018-02-01 0:00:00';
-	stoptime '2018-02-28 0:00:00';
+	stoptime '2019-02-28 0:00:00';
 }
 
 module tape;
@@ -37,7 +37,7 @@ class auction {
     double current_price_stdev_24h;
 }
 object auction {
-    is_block_node true;
+    is_block_node false;
     url 11.10.1.1;
     name Market_pool;
     special_mode NONE;
@@ -59,10 +59,10 @@ object stub_bidder {
         url 11.10.1.1;
 	name buyer_1;
 	role SELLER;
-	bid_period 900;
+	bid_period 60;
 	market Market_pool;
 	price 0.3;
-	quantity 2400;
+	quantity 24000;
 	count 10000;
 }
 
@@ -1221,7 +1221,47 @@ object regulator:650630 {
 }
 
 // House 1
-object house:..20 {
+object house {
+     parent trip_meter1;
+     floor_area random.normal(1750,400);
+     schedule_skew random.normal(3600,-3600);
+     heating_system_type HEAT_PUMP;
+     cooling_system_type ELECTRIC;
+
+     object controller {
+	   is_block_node true;
+	   is_read_node true;
+    	   url 11.10.1.1;
+           schedule_skew random.normal(3600,-3600);
+           market Market_pool;
+           bid_mode ON;
+           control_mode DOUBLE_RAMP;
+           resolve_mode DEADBAND;
+           slider_setting_heat 0.500;
+           slider_setting_cool 0.500;
+           heating_base_setpoint 66;
+           cooling_base_setpoint 72;
+           period 900;
+           average_target current_price_mean_24h;
+           standard_deviation_target current_price_stdev_24h;
+           target air_temperature;
+           heating_setpoint heating_setpoint;
+           heating_demand last_heating_load;
+           cooling_setpoint cooling_setpoint;
+           cooling_demand last_cooling_load;
+           deadband thermostat_deadband;
+           total hvac_load;
+           load hvac_load;
+           state power_state;
+       };
+
+     thermal_integrity_level 3;
+     air_temperature 70;
+     mass_temperature 70;
+     cooling_COP 2.5;
+}
+
+object house:..19 {
      parent trip_meter1;
      floor_area random.normal(1750,400);
      schedule_skew random.normal(3600,-3600);
@@ -1417,7 +1457,46 @@ object house:..20 {
 }
 
 // House 6
-object house:..20 {
+object house {
+	parent trip_meter6;
+	schedule_skew random.normal(3600,-3600);
+	heating_system_type HEAT_PUMP;
+	cooling_system_type ELECTRIC;
+
+	object controller {
+	   is_block_node true;
+	   is_read_node true;
+    	   url 11.10.1.3;
+	   schedule_skew random.normal(3600,-3600);
+	   market Market_pool;
+	   bid_mode ON;
+	   control_mode DOUBLE_RAMP;
+	   resolve_mode DEADBAND;
+	   slider_setting_heat 0.500;
+	   slider_setting_cool 0.500;
+	   heating_base_setpoint 66;
+	   cooling_base_setpoint 72;
+	   period 900;
+	   average_target current_price_mean_24h;
+	   standard_deviation_target current_price_stdev_24h;
+	   target air_temperature;
+	   heating_setpoint heating_setpoint;
+	   heating_demand last_heating_load;
+	   cooling_setpoint cooling_setpoint;
+	   cooling_demand last_cooling_load;
+	   deadband thermostat_deadband;
+	   total hvac_load;
+	   load hvac_load;
+	   state power_state;
+	};
+
+	thermal_integrity_level 3;
+	air_temperature 70;
+	mass_temperature 70;
+	cooling_COP 2.5;
+}
+
+object house:..19 {
 	parent trip_meter6;
 	schedule_skew random.normal(3600,-3600);
 	heating_system_type HEAT_PUMP;
@@ -1612,7 +1691,45 @@ object house:..20 {
 }
 
 // House 11
-object house:..20 {
+object house {
+	parent trip_meter11;
+	schedule_skew random.normal(3600,-3600);
+	heating_system_type HEAT_PUMP;
+	cooling_system_type ELECTRIC;
+
+	object controller {
+	   is_block_node true;
+	   is_read_node true;
+    	   url 11.10.1.2;
+	   schedule_skew random.normal(3600,-3600);
+	   market Market_pool;
+	   bid_mode ON;
+	   control_mode DOUBLE_RAMP;
+	   resolve_mode DEADBAND;
+	   slider_setting_heat 0.500;
+	   slider_setting_cool 0.500;
+	   heating_base_setpoint 66;
+	   cooling_base_setpoint 72;
+	   period 900;
+	   average_target current_price_mean_24h;
+	   standard_deviation_target current_price_stdev_24h;
+	   target air_temperature;
+	   heating_setpoint heating_setpoint;
+	   heating_demand last_heating_load;
+	   cooling_setpoint cooling_setpoint;
+	   cooling_demand last_cooling_load;
+	   deadband thermostat_deadband;
+	   total hvac_load;
+	   load hvac_load;
+	   state power_state;
+	};
+
+	thermal_integrity_level 3;
+	air_temperature 70;
+	mass_temperature 70;
+	cooling_COP 2.5;
+}
+object house:..19 {
 	parent trip_meter11;
 	schedule_skew random.normal(3600,-3600);
 	heating_system_type HEAT_PUMP;
