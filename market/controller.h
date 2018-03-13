@@ -18,6 +18,7 @@ public:
 	blockNode blockchain;
 	marketStruct blockchainMarket;
 	bool is_block_node;
+	bool is_read_node;
 	char32 url;
 	controller(MODULE *);
 	int create(void);

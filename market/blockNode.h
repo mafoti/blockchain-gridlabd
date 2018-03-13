@@ -31,7 +31,7 @@ public:
 	void initNode(int id);
 	void startNode(char *_url);
 	void clearMarket();
-	void readClearing();
+	void readClearing(char t[]);
 	double getLastPrice();
 	double getAvgPrice();
 	double getStdPrice();

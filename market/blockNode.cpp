@@ -29,7 +29,7 @@
 
 using namespace std;
 
-string contractAddress = "0x368cbd3514a671e3a6c7d5ca865576a6face12fc";
+string contractAddress = "0xf176c2f03773b63a6e3659423d7380bfa276dcb3";
 
 
 void blockNode::initNode(int id) {
@@ -291,9 +291,10 @@ void blockNode::submitGenerationBid(int price, int quantity){
 	}
 }
 
-void blockNode::readClearing() {
+void blockNode::readClearing(char t[]) {
 
 	jsonrpc::HttpClient httpclient("http://" + blockChain_url + ":" + stringPort);
+	//jsonrpc::HttpClient httpclient("http://127.0.0.1:8100");
 	EthereumAPI c(httpclient);
 	Json::Value accounts;
 
@@ -309,7 +310,18 @@ void blockNode::readClearing() {
 		}
 	if(accountCreated){
 		try{
-			Json::Value root; // {}
+			Json::Value result = c.eth_getMarketClearing();
+			cout << "get market clearing result " << result << endl;
+			std::ofstream myfile;
+			myfile.open("clearingResults.txt", std::ios_base::app);
+			if (myfile.is_open()) {
+				myfile << t << endl;
+				myfile << result << endl;
+				myfile.close();
+			} else
+				cout << "Unable to open file";
+
+			/*Json::Value root; // {}
 			root["from"] = account;
 			root["to"] = contractAddress;
 			root["data"] = "0x027cb7c6";
@@ -330,7 +342,7 @@ void blockNode::readClearing() {
 			if(prices.size()>100)
 			{
 				prices.erase(prices.begin());
-			}
+			}*/
 		}
 		catch (jsonrpc::JsonRpcException & e)
 		{
@@ -391,10 +403,6 @@ double blockNode::getStdPrice() {
 
 blockNode::blockNode() {
 
-	/*id++;
-	printf("id = %d \n", this->id);
-	nodeId = 30300 + id;
-	rpcPort = 8101 + id;*/
 }
 
 blockNode::~blockNode() {

@@ -247,6 +247,15 @@ class EthereumAPI : public jsonrpc::Client
             else
                 throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
         }
+        Json::Value eth_getMarketClearing() throw (jsonrpc::JsonRpcException)
+		{
+			Json::Value p;
+			Json::Value result = this->CallMethod("eth_getMarketClearing", p);
+			if (result.isObject())
+				return result;
+			else
+				throw jsonrpc::JsonRpcException(jsonrpc::Errors::ERROR_CLIENT_INVALID_RESPONSE, result.toStyledString());
+		}
         std::string eth_call(const Json::Value& param1, const std::string& param2) throw (jsonrpc::JsonRpcException)
         {
             Json::Value p;

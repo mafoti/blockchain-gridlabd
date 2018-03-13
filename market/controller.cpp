@@ -132,6 +132,7 @@ controller::controller(MODULE *module){
 			PT_int32, "bid_delay", PADDR(bid_delay),
 			PT_char32, "thermostat_state", PADDR(thermostat_state), PT_DESCRIPTION, "The name of the thermostat state property within the object being controlled",
 			PT_bool, "is_block_node", PADDR(is_block_node),
+			PT_bool, "is_read_node", PADDR(is_read_node),
 			PT_char32, "url", PADDR(url), PT_DESCRIPTION, "the url of the blockchain node",
 			// PROXY PROPERTIES
 			PT_double, "proxy_average", PADDR(proxy_avg),
@@ -332,6 +333,9 @@ int controller::init(OBJECT *parent){
 	OBJECT *hdr = OBJECTHDR(this);
 	if(is_block_node==NULL){
 		is_block_node=false;
+	}
+	if(is_read_node==NULL){
+		is_read_node=false;
 	}
 	if(is_block_node){
 		this->blockchain.startNode(url.get_string());
@@ -1667,10 +1671,10 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 
 	}
 	else if (control_mode == CN_DOUBLE_RAMP){
-		this->blockchain.readClearing();
-		clrP = this->blockchain.getLastPrice();
-		avgP = this->blockchain.getAvgPrice();
-		stdP = this->blockchain.getStdPrice();
+
+		//clrP = this->blockchain.getLastPrice();
+		//avgP = this->blockchain.getAvgPrice();
+		//stdP = this->blockchain.getStdPrice();
 		/*
 		double heat_range_high;
 		double heat_range_low;
@@ -1722,6 +1726,12 @@ TIMESTAMP controller::sync(TIMESTAMP t0, TIMESTAMP t1){
 		}
 		// if the market has updated,
 		if(lastmkt_id != marketId){
+			if(is_read_node){
+				char timenext_run[128];
+				gl_printtime(next_run, timenext_run, 127);
+				this->blockchain.readClearing(timenext_run);
+			}
+
 			lastmkt_id = marketId;
 			lastbid_id = -1;
 			// retrieve cleared price
