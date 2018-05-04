@@ -15,7 +15,8 @@ static time_t starttime = 0;
 time_t realtime_starttime(void)
 {
 	if ( starttime==0 )
-		starttime = realtime_now();
+		starttime = 1517443200;
+		//starttime = realtime_now();
 	return starttime;
 }
 time_t realtime_runtime(void)

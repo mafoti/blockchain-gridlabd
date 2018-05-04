@@ -1153,7 +1153,7 @@ TIMESTAMP generator_controller::sync(TIMESTAMP t0, TIMESTAMP t1)
 						bid_power_active = gl_get_double_by_name(parent2, "TotalRealPow");
 						bid_price = gl_get_double_by_name(parent2, "price");
 						controller_bid.price = *bid_price;
-						controller_bid.quantity = *bid_power_active;
+						controller_bid.quantity = *bid_power_active/1000;
 						//printf("wind bid_price=%f, bid_quantity=%f \n", controller_bid.price, controller_bid.quantity);
 
 					}
@@ -1219,7 +1219,7 @@ TIMESTAMP generator_controller::sync(TIMESTAMP t0, TIMESTAMP t1)
 						bid_power_active = gl_get_double_by_name(parent2, "TotalRealPow");
 						bid_price = gl_get_double_by_name(parent2, "price");
 						controller_bid.price = *bid_price;
-						controller_bid.quantity = *bid_power_active;
+						controller_bid.quantity = *bid_power_active/1000;
 						//printf("wind bid_price=%f, bid_quantity=%f \n", controller_bid.price, controller_bid.quantity);
 
 					}

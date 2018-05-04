@@ -1784,7 +1784,8 @@ STATUS exec_start(void)
 	{
 		char buffer[64];
 		time_t gtime;
-		time(&gtime);
+		//time(&gtime);
+		gtime = 1517443200;
 		global_clock = gtime;
 		output_verbose("realtime mode requires using now (%s) as starttime", convert_from_timestamp(global_clock,buffer,sizeof(buffer))>0?buffer:"invalid time");
 		if ( global_stoptime<global_clock )

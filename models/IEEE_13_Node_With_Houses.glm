@@ -8,9 +8,7 @@
 #define stylesheet=http://gridlab-d.svn.sourceforge.net/viewvc/gridlab-d/trunk/core/gridlabd-2_0
 
 clock {
-	timezone EU/GR/Athens;
-	starttime '2018-02-01 0:00:00';
-	stoptime '2019-02-28 0:00:00';
+
 }
 
 module tape;
@@ -35,7 +33,7 @@ module residential {
 class auction {
     double current_price_mean_24h;
     double current_price_stdev_24h;
-}
+};
 object auction {
     is_block_node false;
     url 11.10.1.1;
@@ -51,8 +49,8 @@ object auction {
   	file "market_1.csv";
  	interval 60;
         limit 1111111111168;
- 	};
-}
+    };
+};
 
 object stub_bidder {
 	is_block_node true;
@@ -1230,7 +1228,7 @@ object house {
 
      object controller {
 	   is_block_node true;
-	   is_read_node true;
+	   is_read_node false;
     	   url 11.10.1.1;
            schedule_skew random.normal(3600,-3600);
            market Market_pool;
@@ -1255,6 +1253,34 @@ object house {
            state power_state;
        };
 
+	object waterheater {
+        	schedule_skew random.normal(3600,-3600);
+		heat_mode ELECTRIC;
+        	tank_volume random.normal(60,20);
+        	heating_element_capacity 4.0 kW;
+        	tank_setpoint 120;
+        	temperature 121;
+        	thermostat_deadband 4.0;
+        	location INSIDE;
+        	tank_UA 3.3;
+		object controller {
+			schedule_skew random.normal(3600,-3600);
+			market Market_pool;
+			use_predictive_bidding FALSE;
+			control_mode RAMP;
+			resolve_mode DEADBAND;
+			period 900;
+			average_target current_price_mean_24h;           
+			standard_deviation_target current_price_stdev_24h;  
+			target inlet_water_temperature;
+			setpoint tank_setpoint;
+			demand actual_load;
+			deadband thermostat_deadband;
+			total actual_load;
+			load actual_load;
+			
+		};
+	};
      thermal_integrity_level 3;
      air_temperature 70;
      mass_temperature 70;
@@ -1293,7 +1319,34 @@ object house:..19 {
            load hvac_load;
            state power_state;
        };
-
+	object waterheater {
+        	schedule_skew random.normal(3600,-3600);
+		heat_mode ELECTRIC;
+        	tank_volume random.normal(60,20);
+        	heating_element_capacity 4.0 kW;
+        	tank_setpoint 120;
+        	temperature 121;
+        	thermostat_deadband 4.0;
+        	location INSIDE;
+        	tank_UA 3.3;
+		object controller {
+			schedule_skew random.normal(3600,-3600);
+			market Market_pool;
+			use_predictive_bidding FALSE;
+			control_mode RAMP;
+			resolve_mode DEADBAND;
+			period 900;
+			average_target current_price_mean_24h;           
+			standard_deviation_target current_price_stdev_24h;  
+			target inlet_water_temperature;
+			setpoint tank_setpoint;
+			demand actual_load;
+			deadband thermostat_deadband;
+			total actual_load;
+			load actual_load;
+			
+		};
+	};
      thermal_integrity_level 3;
      air_temperature 70;
      mass_temperature 70;
@@ -1332,7 +1385,34 @@ object house:..20 {
 	   load hvac_load;
 	   state power_state;
 	};
-
+	object waterheater {
+        	schedule_skew random.normal(3600,-3600);
+		heat_mode ELECTRIC;
+        	tank_volume random.normal(60,20);
+        	heating_element_capacity 4.0 kW;
+        	tank_setpoint 120;
+        	temperature 121;
+        	thermostat_deadband 4.0;
+        	location INSIDE;
+        	tank_UA 3.3;
+		object controller {
+			schedule_skew random.normal(3600,-3600);
+			market Market_pool;
+			use_predictive_bidding FALSE;
+			control_mode RAMP;
+			resolve_mode DEADBAND;
+			period 900;
+			average_target current_price_mean_24h;           
+			standard_deviation_target current_price_stdev_24h;  
+			target inlet_water_temperature;
+			setpoint tank_setpoint;
+			demand actual_load;
+			deadband thermostat_deadband;
+			total actual_load;
+			load actual_load;
+			
+		};
+	};
 	thermal_integrity_level 3;
 	air_temperature 70;
 	mass_temperature 70;
@@ -1371,7 +1451,34 @@ object house:..20 {
 	   load hvac_load;
 	   state power_state;
 	};
-
+	object waterheater {
+        	schedule_skew random.normal(3600,-3600);
+		heat_mode ELECTRIC;
+        	tank_volume random.normal(60,20);
+        	heating_element_capacity 4.0 kW;
+        	tank_setpoint 120;
+        	temperature 121;
+        	thermostat_deadband 4.0;
+        	location INSIDE;
+        	tank_UA 3.3;
+		object controller {
+			schedule_skew random.normal(3600,-3600);
+			market Market_pool;
+			use_predictive_bidding FALSE;
+			control_mode RAMP;
+			resolve_mode DEADBAND;
+			period 900;
+			average_target current_price_mean_24h;           
+			standard_deviation_target current_price_stdev_24h;  
+			target inlet_water_temperature;
+			setpoint tank_setpoint;
+			demand actual_load;
+			deadband thermostat_deadband;
+			total actual_load;
+			load actual_load;
+			
+		};
+	};
 	thermal_integrity_level 3;
 	air_temperature 70;
 	mass_temperature 70;
@@ -1410,7 +1517,34 @@ object house:..20 {
 	   load hvac_load;
 	   state power_state;
 	};
-
+	object waterheater {
+        	schedule_skew random.normal(3600,-3600);
+		heat_mode ELECTRIC;
+        	tank_volume random.normal(60,20);
+        	heating_element_capacity 4.0 kW;
+        	tank_setpoint 120;
+        	temperature 121;
+        	thermostat_deadband 4.0;
+        	location INSIDE;
+        	tank_UA 3.3;
+		object controller {
+			schedule_skew random.normal(3600,-3600);
+			market Market_pool;
+			use_predictive_bidding FALSE;
+			control_mode RAMP;
+			resolve_mode DEADBAND;
+			period 900;
+			average_target current_price_mean_24h;           
+			standard_deviation_target current_price_stdev_24h;  
+			target inlet_water_temperature;
+			setpoint tank_setpoint;
+			demand actual_load;
+			deadband thermostat_deadband;
+			total actual_load;
+			load actual_load;
+			
+		};
+	};
 	thermal_integrity_level 3;
 	air_temperature 70;
 	mass_temperature 70;
@@ -1449,7 +1583,34 @@ object house:..20 {
 	   load hvac_load;
 	   state power_state;
 	};
-
+	object waterheater {
+        	schedule_skew random.normal(3600,-3600);
+		heat_mode ELECTRIC;
+        	tank_volume random.normal(60,20);
+        	heating_element_capacity 4.0 kW;
+        	tank_setpoint 120;
+        	temperature 121;
+        	thermostat_deadband 4.0;
+        	location INSIDE;
+        	tank_UA 3.3;
+		object controller {
+			schedule_skew random.normal(3600,-3600);
+			market Market_pool;
+			use_predictive_bidding FALSE;
+			control_mode RAMP;
+			resolve_mode DEADBAND;
+			period 900;
+			average_target current_price_mean_24h;           
+			standard_deviation_target current_price_stdev_24h;  
+			target inlet_water_temperature;
+			setpoint tank_setpoint;
+			demand actual_load;
+			deadband thermostat_deadband;
+			total actual_load;
+			load actual_load;
+			
+		};
+	};
 	thermal_integrity_level 3;
 	air_temperature 70;
 	mass_temperature 70;
@@ -1465,7 +1626,7 @@ object house {
 
 	object controller {
 	   is_block_node true;
-	   is_read_node true;
+	   is_read_node false;
     	   url 11.10.1.3;
 	   schedule_skew random.normal(3600,-3600);
 	   market Market_pool;
@@ -1489,7 +1650,34 @@ object house {
 	   load hvac_load;
 	   state power_state;
 	};
-
+	object waterheater {
+        	schedule_skew random.normal(3600,-3600);
+		heat_mode ELECTRIC;
+        	tank_volume random.normal(60,20);
+        	heating_element_capacity 4.0 kW;
+        	tank_setpoint 120;
+        	temperature 121;
+        	thermostat_deadband 4.0;
+        	location INSIDE;
+        	tank_UA 3.3;
+		object controller {
+			schedule_skew random.normal(3600,-3600);
+			market Market_pool;
+			use_predictive_bidding FALSE;
+			control_mode RAMP;
+			resolve_mode DEADBAND;
+			period 900;
+			average_target current_price_mean_24h;           
+			standard_deviation_target current_price_stdev_24h;  
+			target inlet_water_temperature;
+			setpoint tank_setpoint;
+			demand actual_load;
+			deadband thermostat_deadband;
+			total actual_load;
+			load actual_load;
+			
+		};
+	};
 	thermal_integrity_level 3;
 	air_temperature 70;
 	mass_temperature 70;
@@ -1527,7 +1715,34 @@ object house:..19 {
 	   load hvac_load;
 	   state power_state;
 	};
-
+	object waterheater {
+        	schedule_skew random.normal(3600,-3600);
+		heat_mode ELECTRIC;
+        	tank_volume random.normal(60,20);
+        	heating_element_capacity 4.0 kW;
+        	tank_setpoint 120;
+        	temperature 121;
+        	thermostat_deadband 4.0;
+        	location INSIDE;
+        	tank_UA 3.3;
+		object controller {
+			schedule_skew random.normal(3600,-3600);
+			market Market_pool;
+			use_predictive_bidding FALSE;
+			control_mode RAMP;
+			resolve_mode DEADBAND;
+			period 900;
+			average_target current_price_mean_24h;           
+			standard_deviation_target current_price_stdev_24h;  
+			target inlet_water_temperature;
+			setpoint tank_setpoint;
+			demand actual_load;
+			deadband thermostat_deadband;
+			total actual_load;
+			load actual_load;
+			
+		};
+	};
 	thermal_integrity_level 3;
 	air_temperature 70;
 	mass_temperature 70;
@@ -1566,7 +1781,34 @@ object house:..20 {
 	   load hvac_load;
 	   state power_state;
 	};
-
+	object waterheater {
+        	schedule_skew random.normal(3600,-3600);
+		heat_mode ELECTRIC;
+        	tank_volume random.normal(60,20);
+        	heating_element_capacity 4.0 kW;
+        	tank_setpoint 120;
+        	temperature 121;
+        	thermostat_deadband 4.0;
+        	location INSIDE;
+        	tank_UA 3.3;
+		object controller {
+			schedule_skew random.normal(3600,-3600);
+			market Market_pool;
+			use_predictive_bidding FALSE;
+			control_mode RAMP;
+			resolve_mode DEADBAND;
+			period 900;
+			average_target current_price_mean_24h;           
+			standard_deviation_target current_price_stdev_24h;  
+			target inlet_water_temperature;
+			setpoint tank_setpoint;
+			demand actual_load;
+			deadband thermostat_deadband;
+			total actual_load;
+			load actual_load;
+			
+		};
+	};
 	thermal_integrity_level 3;
 	air_temperature 70;
 	mass_temperature 70;
@@ -1605,7 +1847,34 @@ object house:..20 {
 	   load hvac_load;
 	   state power_state;
 	};
-
+	object waterheater {
+        	schedule_skew random.normal(3600,-3600);
+		heat_mode ELECTRIC;
+        	tank_volume random.normal(60,20);
+        	heating_element_capacity 4.0 kW;
+        	tank_setpoint 120;
+        	temperature 121;
+        	thermostat_deadband 4.0;
+        	location INSIDE;
+        	tank_UA 3.3;
+		object controller {
+			schedule_skew random.normal(3600,-3600);
+			market Market_pool;
+			use_predictive_bidding FALSE;
+			control_mode RAMP;
+			resolve_mode DEADBAND;
+			period 900;
+			average_target current_price_mean_24h;           
+			standard_deviation_target current_price_stdev_24h;  
+			target inlet_water_temperature;
+			setpoint tank_setpoint;
+			demand actual_load;
+			deadband thermostat_deadband;
+			total actual_load;
+			load actual_load;
+			
+		};
+	};
 	thermal_integrity_level 3;
 	air_temperature 70;
 	mass_temperature 70;
@@ -1644,7 +1913,34 @@ object house:..20 {
 	   load hvac_load;
 	   state power_state;
 	};
-
+	object waterheater {
+        	schedule_skew random.normal(3600,-3600);
+		heat_mode ELECTRIC;
+        	tank_volume random.normal(60,20);
+        	heating_element_capacity 4.0 kW;
+        	tank_setpoint 120;
+        	temperature 121;
+        	thermostat_deadband 4.0;
+        	location INSIDE;
+        	tank_UA 3.3;
+		object controller {
+			schedule_skew random.normal(3600,-3600);
+			market Market_pool;
+			use_predictive_bidding FALSE;
+			control_mode RAMP;
+			resolve_mode DEADBAND;
+			period 900;
+			average_target current_price_mean_24h;           
+			standard_deviation_target current_price_stdev_24h;  
+			target inlet_water_temperature;
+			setpoint tank_setpoint;
+			demand actual_load;
+			deadband thermostat_deadband;
+			total actual_load;
+			load actual_load;
+			
+		};
+	};
 	thermal_integrity_level 3;
 	air_temperature 70;
 	mass_temperature 70;
@@ -1683,7 +1979,34 @@ object house:..20 {
 	   load hvac_load;
 	   state power_state;
 	};
-
+	object waterheater {
+        	schedule_skew random.normal(3600,-3600);
+		heat_mode ELECTRIC;
+        	tank_volume random.normal(60,20);
+        	heating_element_capacity 4.0 kW;
+        	tank_setpoint 120;
+        	temperature 121;
+        	thermostat_deadband 4.0;
+        	location INSIDE;
+        	tank_UA 3.3;
+		object controller {
+			schedule_skew random.normal(3600,-3600);
+			market Market_pool;
+			use_predictive_bidding FALSE;
+			control_mode RAMP;
+			resolve_mode DEADBAND;
+			period 900;
+			average_target current_price_mean_24h;           
+			standard_deviation_target current_price_stdev_24h;  
+			target inlet_water_temperature;
+			setpoint tank_setpoint;
+			demand actual_load;
+			deadband thermostat_deadband;
+			total actual_load;
+			load actual_load;
+			
+		};
+	};
 	thermal_integrity_level 3;
 	air_temperature 70;
 	mass_temperature 70;
@@ -1699,7 +2022,7 @@ object house {
 
 	object controller {
 	   is_block_node true;
-	   is_read_node true;
+	   is_read_node false;
     	   url 11.10.1.2;
 	   schedule_skew random.normal(3600,-3600);
 	   market Market_pool;
@@ -1723,7 +2046,34 @@ object house {
 	   load hvac_load;
 	   state power_state;
 	};
-
+	object waterheater {
+        	schedule_skew random.normal(3600,-3600);
+		heat_mode ELECTRIC;
+        	tank_volume random.normal(60,20);
+        	heating_element_capacity 4.0 kW;
+        	tank_setpoint 120;
+        	temperature 121;
+        	thermostat_deadband 4.0;
+        	location INSIDE;
+        	tank_UA 3.3;
+		object controller {
+			schedule_skew random.normal(3600,-3600);
+			market Market_pool;
+			use_predictive_bidding FALSE;
+			control_mode RAMP;
+			resolve_mode DEADBAND;
+			period 900;
+			average_target current_price_mean_24h;           
+			standard_deviation_target current_price_stdev_24h;  
+			target inlet_water_temperature;
+			setpoint tank_setpoint;
+			demand actual_load;
+			deadband thermostat_deadband;
+			total actual_load;
+			load actual_load;
+			
+		};
+	};
 	thermal_integrity_level 3;
 	air_temperature 70;
 	mass_temperature 70;
@@ -1760,7 +2110,34 @@ object house:..19 {
 	   load hvac_load;
 	   state power_state;
 	};
-
+	object waterheater {
+        	schedule_skew random.normal(3600,-3600);
+		heat_mode ELECTRIC;
+        	tank_volume random.normal(60,20);
+        	heating_element_capacity 4.0 kW;
+        	tank_setpoint 120;
+        	temperature 121;
+        	thermostat_deadband 4.0;
+        	location INSIDE;
+        	tank_UA 3.3;
+		object controller {
+			schedule_skew random.normal(3600,-3600);
+			market Market_pool;
+			use_predictive_bidding FALSE;
+			control_mode RAMP;
+			resolve_mode DEADBAND;
+			period 900;
+			average_target current_price_mean_24h;           
+			standard_deviation_target current_price_stdev_24h;  
+			target inlet_water_temperature;
+			setpoint tank_setpoint;
+			demand actual_load;
+			deadband thermostat_deadband;
+			total actual_load;
+			load actual_load;
+			
+		};
+	};
 	thermal_integrity_level 3;
 	air_temperature 70;
 	mass_temperature 70;
@@ -1799,7 +2176,34 @@ object house:..20 {
 	   load hvac_load;
 	   state power_state;
 	};
-
+	object waterheater {
+        	schedule_skew random.normal(3600,-3600);
+		heat_mode ELECTRIC;
+        	tank_volume random.normal(60,20);
+        	heating_element_capacity 4.0 kW;
+        	tank_setpoint 120;
+        	temperature 121;
+        	thermostat_deadband 4.0;
+        	location INSIDE;
+        	tank_UA 3.3;
+		object controller {
+			schedule_skew random.normal(3600,-3600);
+			market Market_pool;
+			use_predictive_bidding FALSE;
+			control_mode RAMP;
+			resolve_mode DEADBAND;
+			period 900;
+			average_target current_price_mean_24h;           
+			standard_deviation_target current_price_stdev_24h;  
+			target inlet_water_temperature;
+			setpoint tank_setpoint;
+			demand actual_load;
+			deadband thermostat_deadband;
+			total actual_load;
+			load actual_load;
+			
+		};
+	};
 	thermal_integrity_level 3;
 	air_temperature 70;
 	mass_temperature 70;

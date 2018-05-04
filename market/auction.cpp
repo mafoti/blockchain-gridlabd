@@ -880,6 +880,8 @@ void auction::clear_market(void)
 	if(is_block_node){
 		 this->blockchain.clearMarket();
 	}
+	this->blockchain.submitBidsAtMarketClearing();
+
 	unsigned int sph24 = (unsigned int)(3600/period*24);
 	BID unresponsive;
 	extern double bid_offset;
@@ -1106,10 +1108,12 @@ void auction::clear_market(void)
 		}
 	} else if ((asks.getcount()>0) && offers.getcount()>0)
 	{
+
 		TIMESTAMP submit_time = gl_globalclock;
 		DATETIME dt;
 		gl_localtime(submit_time,&dt);
 		char buffer[256];
+
 		/* clear market */
 		unsigned int i=0, j=0;
 		BID *buy = asks.getbid(i), *sell = offers.getbid(j);

@@ -8,7 +8,6 @@
 #ifndef BLOCKNODE_H_
 #define BLOCKNODE_H_
 #include <string>
-#include <vector>
 struct marketStruct {
 	  int price;
 	  int quantity;
@@ -23,13 +22,14 @@ public:
 	int rpcPort;
 	std::string stringPort;
 	std::string stringId;
-	std::vector <double> prices;
+	//std::vector <double> prices;
 	std::string blockChain_url;
 	bool accountCreated;
 	bool accountHasBalance;
 	std::string account;
 	void initNode(int id);
 	void startNode(char *_url);
+	void submitBidsAtMarketClearing();
 	void clearMarket();
 	void readClearing(char t[]);
 	double getLastPrice();
